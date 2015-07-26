@@ -1,5 +1,14 @@
 package swen222.cluedo.game;
 
+import swen222.cluedo.game.model.SuggestionResponse;
+import swen222.cluedo.game.model.card.Card;
+import swen222.cluedo.game.model.Direction;
+import swen222.cluedo.game.model.Player;
+import swen222.cluedo.game.model.Suggestion;
+import swen222.cluedo.game.model.card.Room;
+
+import java.util.List;
+
 public interface CluedoInterface {
 
     /**
