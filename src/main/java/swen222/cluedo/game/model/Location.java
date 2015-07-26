@@ -1,8 +1,6 @@
 package swen222.cluedo.game.model;
 
-/**
- * Created by josephbennett on 26/07/15.
- */
+
 class Location {
     int x;
     int y;
