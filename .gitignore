@@ -1,0 +1,12 @@
+# IntellJ
+*.iml
+.idea/
+
+# Gradle
+.gradle
+build/
+
+# Eclipse
+.project
+
+local.properties
