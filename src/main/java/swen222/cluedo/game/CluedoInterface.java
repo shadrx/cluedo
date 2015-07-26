@@ -76,5 +76,5 @@ public interface CluedoInterface {
      *
      * @param response a response to the suggestion the player made
      */
-    void notifyPlayerResponse(SuggestionResponse response);
+    void notifyPlayerResponse(Card response);
 }
