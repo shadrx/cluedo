@@ -32,7 +32,7 @@ public class Board {
     }
 
 
-    private Room roomForCharacter(Character c) {
+    private Room roomForCharacter(char c) {
         switch (c) {
             case 'K': return Room.Kitchen;
             case 'B': return Room.Ballroom;

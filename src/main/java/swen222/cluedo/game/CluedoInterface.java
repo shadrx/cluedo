@@ -31,6 +31,12 @@ public interface CluedoInterface {
     void notifyGameOver();
 
 
+    /**
+     * Display the game state in a mannner fitting to this implementation. For instance, a text-based implementation might print an ASCII map;
+     * a GUI based application would update its GUI.
+     * @param gameState The current game state.
+     */
+    void showGameState(GameState gameState);
 
     /**
      * Request a movement on the board that is exactly the given distance.

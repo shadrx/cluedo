@@ -1,5 +1,6 @@
 package swen222.cluedo.game.model;
 
+import com.sun.istack.internal.NotNull;
 import swen222.cluedo.game.model.card.Room;
 import swen222.cluedo.game.model.card.Weapon;
 import swen222.cluedo.game.model.card.Character;
@@ -13,10 +14,13 @@ import swen222.cluedo.game.model.card.Character;
  */
 public class Suggestion {
 
+    @NotNull
     public final Character character;
 
+    @NotNull
     public final Weapon weapon;
 
+    @NotNull
     public final Room room;
 
     public Suggestion(Character character, Weapon weapon, Room room) {
@@ -37,9 +41,9 @@ public class Suggestion {
 
     @Override
     public int hashCode() {
-        int result = character != null ? character.hashCode() : 0;
-        result = 31 * result + (weapon != null ? weapon.hashCode() : 0);
-        result = 31 * result + (room != null ? room.hashCode() : 0);
+        int result = character.hashCode(); //We don't need to check for null here as it is a bug for any of the fields to be null.
+        result = 31 * result + weapon.hashCode();
+        result = 31 * result + room.hashCode();
         return result;
     }
 }

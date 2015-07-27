@@ -7,10 +7,15 @@ import java.util.Set;
 
 public class Player {
 
-    private final Character character;
+    public final Character character;
     private Location location;
 
-    private final Set<Card> cards;
+    /** Each player has their own referenced interface, so that, if desired, the output for each player can be sent to a different interface
+     * without providing other players with information.
+     */
+    public final CluedoInterface cluedoInterface;
+
+    public final Set<Card> cards;
 
     public Player(Character character, Location location, Set<Card> cards) {
         this.character = character;
@@ -36,12 +41,24 @@ public class Player {
         this.location = location;
     }
 
+
     /**
-     * Get the character of this player is playing as.
-     *
-     * @return the character this player is playing as
+     * Gives the possible responses to a suggestion for this player.
+     * @param suggestion The suggestion that the player is responding to
+     * @return A list containing all the possible responses that this player may give. May be empty.
      */
-    public Character character() {
-        return character;
+    List<Suggestion> possibleResponses(Suggestion suggestion) {
+        List<SuggestionResponse> responses = new ArrayList<SuggestionResponse>(3);
+
+        if (this.cards.contains(character)) {
+            responses.add(new SuggestionResponse(SuggestionResponse.Type.DisproveCharacter, character));
+        }
+        if (this.cards.contains(weapon)) {
+            responses.add(new SuggestionResponse(SuggestionResponse.Type.DisproveWeapon, weapon));
+        }
+        if (this.cards.contains(room)) {
+            responses.add(new SuggestionResponse(SuggestionResponse.Type.DisproveRoom, room));
+        }
+        return responses;
     }
 }
