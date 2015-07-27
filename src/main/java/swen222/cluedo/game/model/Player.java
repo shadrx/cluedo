@@ -10,7 +10,7 @@ public class Player {
     private final Character character;
     private Location location;
 
-    private Set<Card> cards;
+    private final Set<Card> cards;
 
     public Player(Character character, Location location, Set<Card> cards) {
         this.character = character;

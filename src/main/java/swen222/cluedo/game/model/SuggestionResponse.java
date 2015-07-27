@@ -17,9 +17,9 @@ public class SuggestionResponse {
     }
 
     enum Type {
-        DISPROVE_CHARACTER,
-        DISPROVE_WEAPON,
-        DISPROVE_ROOM,
-        UNABLE_TO_DISPROVE
+        DisproveCharacter,
+        DisproveWeapon,
+        DisproveRoom,
+        UnableToDisprove
     }
 }
