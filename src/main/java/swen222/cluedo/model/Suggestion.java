@@ -1,9 +1,9 @@
-package swen222.cluedo.game.model;
+package swen222.cluedo.model;
 
 import com.sun.istack.internal.NotNull;
-import swen222.cluedo.game.model.card.Room;
-import swen222.cluedo.game.model.card.Weapon;
-import swen222.cluedo.game.model.card.Character;
+import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.card.Weapon;
+import swen222.cluedo.model.card.CluedoCharacter;
 
 
 /**
@@ -15,7 +15,7 @@ import swen222.cluedo.game.model.card.Character;
 public class Suggestion {
 
     @NotNull
-    public final Character character;
+    public final CluedoCharacter character;
 
     @NotNull
     public final Weapon weapon;
@@ -23,7 +23,7 @@ public class Suggestion {
     @NotNull
     public final Room room;
 
-    public Suggestion(Character character, Weapon weapon, Room room) {
+    public Suggestion(CluedoCharacter character, Weapon weapon, Room room) {
         this.character = character;
         this.weapon = weapon;
         this.room = room;

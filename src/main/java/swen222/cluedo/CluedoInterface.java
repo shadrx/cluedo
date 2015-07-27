@@ -1,13 +1,15 @@
-package swen222.cluedo.game;
+package swen222.cluedo;
 
-import swen222.cluedo.game.model.SuggestionResponse;
-import swen222.cluedo.game.model.card.Card;
-import swen222.cluedo.game.model.Direction;
-import swen222.cluedo.game.model.Player;
-import swen222.cluedo.game.model.Suggestion;
-import swen222.cluedo.game.model.card.Room;
+import swen222.cluedo.model.SuggestionResponse;
+import swen222.cluedo.model.card.Card;
+import swen222.cluedo.model.Direction;
+import swen222.cluedo.model.Player;
+import swen222.cluedo.model.Suggestion;
+import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.GameState;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CluedoInterface {
 
@@ -57,7 +59,7 @@ public interface CluedoInterface {
      * @param player the player to request the accusation from
      * @return an accusation from this player or null if no accusation is made
      */
-    Suggestion requestPlayerAccusation(Player player);
+    Optional<Suggestion> requestPlayerAccusation(Player player);
 
 
 
@@ -68,7 +70,7 @@ public interface CluedoInterface {
      * @param room the room that is part of the suggestion
      * @return a suggestion as to what happened to the victim
      */
-    Suggestion requestPlayerSuggestion(Player player, Room room);
+    Optional<Suggestion> requestPlayerSuggestion(Player player, Room room);
 
     /**
      * Request a response to a suggestion made by another player that could disprove the validity of it.
@@ -84,8 +86,8 @@ public interface CluedoInterface {
     /**
      * Notify the player with a response to their suggestion.
      *
-     * @param player the player that responded
+     * @param player the player to whom the response is being given
      * @param response a response to the suggestion the player made
      */
-    void notifyPlayerResponse(Player player, Card response);
+    void notifyPlayerResponse(Player player, SuggestionResponse response);
 }

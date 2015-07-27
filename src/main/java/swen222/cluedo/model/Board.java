@@ -1,24 +1,35 @@
-package swen222.cluedo.game.model;
+package swen222.cluedo.model;
 
-import swen222.cluedo.game.model.card.Room;
+import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.Location;
 
-import javax.xml.stream.Location;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 public class Board {
+
 
     public final Tile tiles[][];
 
     public static class Tile {
-        public final Room room;
+        public final Optional<Room> room;
         public final Map<Direction, Location> adjacentLocations;
         // two tiles are adjacent if there is no wall between them
 
-        public Tile(Room room, Map<Direction, Location> adjacentLocations) {
+        public Tile(Optional<Room> room, Map<Direction, Location> adjacentLocations) {
             this.room = room;
             this.adjacentLocations = adjacentLocations;
         }
+    }
+
+    public Board(Path mapPath) throws IOException {
+        List<String> lines = Files.readAllLines(mapPath);
+        this.tiles = loadMap(lines);
     }
 
     /**
@@ -48,17 +59,17 @@ public class Board {
     }
 
     private Map<Direction, Location> adjacentLocations(int mask, int locationX, int locationY) {
-        Map<Direction, Location> adjacentLocations = new HashMap<Direction, Room>(4);
-        if (mask & 1 != 0) {
+        Map<Direction, Location> adjacentLocations = new HashMap<Direction, Location>(4);
+        if ((mask & 1) != 0) {
             adjacentLocations.put(Direction.Left, new Location(locationX - 1, locationY));
         }
-        if (mask & (1 << 1) != 0) {
+        if ((mask & (1 << 1)) != 0) {
             adjacentLocations.put(Direction.Up, new Location(locationX, locationY - 1));
         }
-        if (mask & (1 << 2) != 0) {
+        if ((mask & (1 << 2)) != 0) {
             adjacentLocations.put(Direction.Right, new Location(locationX + 1, locationY));
         }
-        if (mask & (1 << 3) != 0) {
+        if ((mask & (1 << 3)) != 0) {
             adjacentLocations.put(Direction.Down, new Location(locationX, locationY + 1));
         }
         return adjacentLocations;
@@ -83,8 +94,8 @@ public class Board {
         }
     }
 
-    private Tile[][] loadMap(String[] lines) {
-        Tile[][] map = new Tile[lines.length][];
+    private Tile[][] loadMap(List<String> lines) {
+        Tile[][] map = new Tile[lines.size()][];
 
         Tile kitchenPathTile = null, conservatoryPathTile = null, studyPathTile = null, loungePathTile = null;
         Location kitchenPathLocation = null, conservatoryPathLocation = null, studyPathLocation = null, loungePathLocation = null;
@@ -92,23 +103,23 @@ public class Board {
         int y = 0;
         for (String line : lines) {
             String[] tiles = line.split(" ");
-            map[i] = new Tile[tiles.length];
+            map[y] = new Tile[tiles.length];
             int x = 0;
-            for (String tile : tiles) {
-                Room room = roomForCharacter(tile.characterAt(0));
-                Integer mask = Integer.parseInt(tile.substring(1));
+            for (String tileStr : tiles) {
+                Room room = roomForCharacter(tileStr.charAt(0));
+                Integer mask = Integer.parseInt(tileStr.substring(1));
                 Map<Direction, Location> adjacentLocations = this.adjacentLocations(mask, x, y);
-                Tile tile = new Tile(room, adjacentLocations);
+                Tile tile = new Tile(Optional.ofNullable(room), adjacentLocations);
                 map[x][y] = tile;
 
 
-                if (mask & (1 << 4) != 0) { //We need to check for the special path tiles within this method – we can't assign the locations until we've read all the tiles.
+                if ((mask & (1 << 4)) != 0) { //We need to check for the special path tiles within this method – we can't assign the locations until we've read all the tiles.
                    kitchenPathTile = tile; kitchenPathLocation = new Location(x, y);
-                } else if (mask & (1 << 5) != 0) {
-                    studyPathTile = tile; studyPathTile = new Location(x, y);
-                } else if (mask & (1 << 6) != 0) {
+                } else if ((mask & (1 << 5)) != 0) {
+                    studyPathTile = tile; studyPathLocation = new Location(x, y);
+                } else if ((mask & (1 << 6)) != 0) {
                     conservatoryPathTile = tile; conservatoryPathLocation = new Location(x, y);
-                } else if (mask & (1 << 7) != 0) {
+                } else if ((mask & (1 << 7)) != 0) {
                     loungePathTile = tile; loungePathLocation = new Location(x, y);
                 }
 
@@ -121,5 +132,6 @@ public class Board {
         this.linkTiles(kitchenPathTile, kitchenPathLocation, studyPathTile, studyPathLocation);
         this.linkTiles(loungePathTile, loungePathLocation, conservatoryPathTile, conservatoryPathLocation);
 
+        return map;
     }
 }

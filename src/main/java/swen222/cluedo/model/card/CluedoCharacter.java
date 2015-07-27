@@ -1,6 +1,6 @@
-package swen222.cluedo.game.model.card;
+package swen222.cluedo.model.card;
 
-public enum Character implements Card {
+public enum CluedoCharacter implements Card {
     MissScarlet,
     ColonelMustard,
     MrsWhite,

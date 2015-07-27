@@ -1,7 +1,7 @@
-package swen222.cluedo.game.model;
+package swen222.cluedo.model;
 
 
-import swen222.cluedo.game.model.card.Card;
+import swen222.cluedo.model.card.Card;
 
 /**
  * A response to a player's suggestion.
@@ -14,6 +14,10 @@ public class SuggestionResponse {
     public SuggestionResponse(Type type, Card card) {
         this.type = type;
         this.card = card;
+    }
+
+    public static SuggestionResponse UnableToDisprove() {
+        return new SuggestionResponse(Type.UnableToDisprove, null);
     }
 
     enum Type {

@@ -1,4 +1,4 @@
-package swen222.cluedo.game.model;
+package swen222.cluedo.model;
 
 public enum Direction {
     Up, Down, Left, Right;

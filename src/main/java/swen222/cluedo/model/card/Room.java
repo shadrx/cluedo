@@ -1,4 +1,4 @@
-package swen222.cluedo.game.model.card;
+package swen222.cluedo.model.card;
 
 public enum Room implements Card{
     Hallway,

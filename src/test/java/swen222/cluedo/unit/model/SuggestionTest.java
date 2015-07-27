@@ -1,10 +1,10 @@
 package swen222.cluedo.unit.model;
 
 import org.junit.Test;
-import swen222.cluedo.game.model.Suggestion;
-import swen222.cluedo.game.model.card.Character;
-import swen222.cluedo.game.model.card.Room;
-import swen222.cluedo.game.model.card.Weapon;
+import swen222.cluedo.model.Suggestion;
+import swen222.cluedo.model.card.CluedoCharacter;
+import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.card.Weapon;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -13,16 +13,16 @@ public class SuggestionTest {
 
     @Test
     public void suggestionsAreEqualIfThreeCardsAreTheSame() {
-        Suggestion equalSuggestionOne = new Suggestion(Character.COLONEL_MUSTARD, Weapon.DAGGER, Room.BALLROOM);
-        Suggestion equalSuggestionTwo = new Suggestion(Character.COLONEL_MUSTARD, Weapon.DAGGER, Room.BALLROOM);
+        Suggestion equalSuggestionOne = new Suggestion(CluedoCharacter.ColonelMustard , Weapon.Dagger, Room.Ballroom);
+        Suggestion equalSuggestionTwo = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.Dagger, Room.Ballroom);
 
         assertEquals(equalSuggestionOne, equalSuggestionTwo);
     }
 
     @Test
     public void suggestionsAreNotEqualIfThreeCardsAreDifferent() {
-        Suggestion equalSuggestionOne = new Suggestion(Character.COLONEL_MUSTARD, Weapon.DAGGER, Room.BALLROOM);
-        Suggestion equalSuggestionTwo = new Suggestion(Character.COLONEL_MUSTARD, Weapon.LEADPIPE, Room.BALLROOM);
+        Suggestion equalSuggestionOne = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.Dagger, Room.Ballroom);
+        Suggestion equalSuggestionTwo = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.LeadPipe, Room.Ballroom);
 
         assertNotEquals(equalSuggestionOne, equalSuggestionTwo);
     }

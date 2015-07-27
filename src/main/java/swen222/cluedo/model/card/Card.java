@@ -1,4 +1,4 @@
-package swen222.cluedo.game.model.card;
+package swen222.cluedo.model.card;
 
 /**
  * The cards available in the game
