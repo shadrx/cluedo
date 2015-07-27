@@ -35,10 +35,11 @@ public interface CluedoInterface {
     /**
      * Request a movement on the board that is exactly the given distance.
      *
+     * @param player the player to move
      * @param distance the distance the move must be
      * @return a sequence of directions making up the move
      */
-    List<Direction> requestPlayerMove(int distance);
+    List<Direction> requestPlayerMove(Player player, int distance);
 
 
 
@@ -47,34 +48,38 @@ public interface CluedoInterface {
      *
      * If the player does not want to make one, then this method will return null.
      *
+     * @param player the player to request the accusation from
      * @return an accusation from this player or null if no accusation is made
      */
-    Suggestion requestPlayerAccusation();
+    Suggestion requestPlayerAccusation(Player player);
 
 
 
     /**
      * Request a suggestion from a player that uses the given room.
      *
+     * @param player the player to get the suggestion from
      * @param room the room that is part of the suggestion
      * @return a suggestion as to what happened to the victim
      */
-    Suggestion requestPlayerSuggestion(Room room);
+    Suggestion requestPlayerSuggestion(Player player, Room room);
 
     /**
      * Request a response to a suggestion made by another player that could disprove the validity of it.
      *
      * If the player cannot disprove the response then null will be returned.
      *
+     * @param player the player to get the response from
      * @param possibleResponses the possible responses the player can make
      * @return a response to a suggestion made by another player
      */
-    SuggestionResponse requestPlayerResponse(List<SuggestionResponse> possibleResponses);
+    SuggestionResponse requestPlayerResponse(Player player, List<SuggestionResponse> possibleResponses);
 
     /**
      * Notify the player with a response to their suggestion.
      *
+     * @param player the player that responded
      * @param response a response to the suggestion the player made
      */
-    void notifyPlayerResponse(Card response);
+    void notifyPlayerResponse(Player player, Card response);
 }
