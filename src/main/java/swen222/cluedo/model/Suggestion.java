@@ -29,6 +29,20 @@ public class Suggestion {
         this.room = room;
     }
 
+    public static Suggestion randomSuggestion() {
+        CluedoCharacter[] characters = CluedoCharacter.values();
+        CluedoCharacter character = characters[(int)(Math.random() * characters.length)];
+
+        Weapon[] weapons = Weapon.values();
+        Weapon weapon = weapons[(int)(Math.random() * weapons.length)];
+
+        Room[] rooms = Room.values();
+        Room room = rooms[(int)(Math.random() * rooms.length)];
+
+        return new Suggestion(character, weapon, room);
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -21,9 +21,9 @@ public class Player {
 
     public final Set<Card> cards;
 
-    public Player(CluedoCharacter character, Location location, Set<Card> cards, CluedoInterface cluedoInterface) {
+    public Player(CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
         this.character = character;
-        this.location = location;
+        this.location = character.startLocation();
         this.cards = cards;
         this.cluedoInterface = cluedoInterface;
     }
