@@ -18,7 +18,8 @@ class Cluedo {
 
     public static void main(String[] args) {
         //Get the number of players
-        //int numPlayers = ...
+        int numPlayers = 0; //TODO: get the number of players from the interface
+        CluedoInterface cluedoInterface = null; //TODO: replace with a valid implementation.
 
         //Load the board
         Board board;
@@ -35,7 +36,7 @@ class Cluedo {
 
         List<CluedoCharacter> availableCharacters =  Arrays.asList(CluedoCharacter.values());
 
-        List<Player> players = new ArrayList<Player>();
+        List<Player> players = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
             CluedoCharacter character = cluedoInterface.askToSelectACharacter(availableCharacters);
             Player player = new Player(character, hands[i], cluedoInterface);
