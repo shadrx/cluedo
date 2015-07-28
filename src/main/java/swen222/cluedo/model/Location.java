@@ -1,7 +1,7 @@
 package swen222.cluedo.model;
 
 
-class Location {
+public class Location {
     public final int x;
     public final int y;
 
@@ -17,8 +17,7 @@ class Location {
 
         Location location = (Location) o;
 
-        if (x != location.x) return false;
-        return y == location.y;
+        return x == location.x && y == location.y;
     }
 
     @Override
@@ -26,5 +25,10 @@ class Location {
         int result = x;
         result = 31 * result + y;
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Location(" + this.x + ", " + this.y + ")";
     }
 }

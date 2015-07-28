@@ -27,9 +27,9 @@ public class Board {
         }
     }
 
-    public Board(Path mapPath) throws IOException {
+    public Board(Path mapPath, int width, int height) throws IOException {
         List<String> lines = Files.readAllLines(mapPath);
-        this.tiles = loadMap(lines);
+        this.tiles = loadMap(lines, width, height);
     }
 
     /**
@@ -94,8 +94,8 @@ public class Board {
         }
     }
 
-    private Tile[][] loadMap(List<String> lines) {
-        Tile[][] map = new Tile[lines.size()][];
+    private Tile[][] loadMap(List<String> lines, int width, int height) {
+        Tile[][] map = new Tile[width][height];
 
         Tile kitchenPathTile = null, conservatoryPathTile = null, studyPathTile = null, loungePathTile = null;
         Location kitchenPathLocation = null, conservatoryPathLocation = null, studyPathLocation = null, loungePathLocation = null;
@@ -103,7 +103,6 @@ public class Board {
         int y = 0;
         for (String line : lines) {
             String[] tiles = line.split(" ");
-            map[y] = new Tile[tiles.length];
             int x = 0;
             for (String tileStr : tiles) {
                 Room room = roomForCharacter(tileStr.charAt(0));
