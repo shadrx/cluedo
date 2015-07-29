@@ -1,9 +1,9 @@
 package swen222.cluedo.model;
 
 
-import swen222.cluedo.CluedoInterface;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
+import swen222.cluedo.userinterface.CluedoInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +12,12 @@ import java.util.Set;
 public class Player {
 
     public final CluedoCharacter character;
-    private Location location;
-
     /** Each player has their own referenced interface, so that, if desired, the output for each player can be sent to a different interface
      * without providing other players with information.
      */
     public final CluedoInterface cluedoInterface;
-
     public final Set<Card> cards;
+    private Location location;
 
     public Player(CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
         this.character = character;
@@ -53,7 +51,7 @@ public class Player {
      * @return A list containing all the possible responses that this player may give. May be empty.
      */
     List<SuggestionResponse> possibleResponses(Suggestion suggestion) {
-        List<SuggestionResponse> responses = new ArrayList<SuggestionResponse>(3);
+        List<SuggestionResponse> responses = new ArrayList<>(3);
 
         if (this.cards.contains(suggestion.character)) {
             responses.add(new SuggestionResponse(SuggestionResponse.Type.DisproveCharacter, suggestion.character));

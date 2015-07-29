@@ -1,19 +1,15 @@
-package swen222.cluedo;
+package swen222.cluedo.userinterface;
 
-import swen222.cluedo.model.SuggestionResponse;
-import swen222.cluedo.model.card.Card;
-import swen222.cluedo.model.Direction;
-import swen222.cluedo.model.Player;
-import swen222.cluedo.model.Suggestion;
+import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
-import swen222.cluedo.model.GameState;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CluedoInterface {
 
+    int getNumberOfPlayers(int min, int max);
 
     /** Requests that the player choose a character to play as. */
     CluedoCharacter askToSelectACharacter(List<CluedoCharacter> availableCharacters);

@@ -6,6 +6,8 @@ import swen222.cluedo.model.Player;
 import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
+import swen222.cluedo.userinterface.ASCIIInterface;
+import swen222.cluedo.userinterface.CluedoInterface;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -18,8 +20,9 @@ class Cluedo {
 
     public static void main(String[] args) {
         //Get the number of players
-        int numPlayers = 0; //TODO: get the number of players from the interface
-        CluedoInterface cluedoInterface = null; //TODO: replace with a valid implementation.
+        CluedoInterface cluedoInterface = new ASCIIInterface(System.in, System.out);
+
+        int numPlayers = cluedoInterface.getNumberOfPlayers(3, 6);
 
         //Load the board
         Board board;
@@ -34,11 +37,12 @@ class Cluedo {
 
         Set<Card>[] hands = Card.dealHands(numPlayers, solution);
 
-        List<CluedoCharacter> availableCharacters =  Arrays.asList(CluedoCharacter.values());
+        List<CluedoCharacter> availableCharacters = new ArrayList<>(Arrays.asList(CluedoCharacter.values()));
 
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
             CluedoCharacter character = cluedoInterface.askToSelectACharacter(availableCharacters);
+            availableCharacters.remove(character);
             Player player = new Player(character, hands[i], cluedoInterface);
             players.add(player);
         }
