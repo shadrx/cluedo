@@ -9,9 +9,22 @@ import java.util.Optional;
 
 public interface CluedoInterface {
 
+    /**
+     * Get the number of players that will take part in the game.
+     *
+     * @param min the minimum amount of players (inclusive)
+     * @param max the maximum amount of players (inclusive)
+     *
+     * @return the number of players that will take part in the game.
+     */
     int getNumberOfPlayers(int min, int max);
 
-    /** Requests that the player choose a character to play as. */
+    /**
+     * Requests that the player choose a character to play as.
+     *
+     * @param availableCharacters list of characters available to choose from
+     * @return the character the player chose
+     * */
     CluedoCharacter askToSelectACharacter(List<CluedoCharacter> availableCharacters);
 
     /**
@@ -35,8 +48,9 @@ public interface CluedoInterface {
 
 
     /**
-     * Display the game state in a mannner fitting to this implementation. For instance, a text-based implementation might print an ASCII map;
-     * a GUI based application would update its GUI.
+     * Display the game state in a manner fitting to this implementation. For instance,
+     * a text-based implementation might print an ASCII map; a GUI based application would update its GUI.
+     *
      * @param gameState The current game state.
      */
     void showGameState(GameState gameState);
