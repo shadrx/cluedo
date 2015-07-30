@@ -95,6 +95,8 @@ public class GameState {
                     return;
                 }
 
+                player.cluedoInterface.showGameState(this);
+
                 int diceRoll = (int)(Math.floor(Math.random() * 6) + 1);
 
                 Optional<Location> newLocation = Optional.empty();

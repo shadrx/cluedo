@@ -1,35 +1,27 @@
 package swen222.cluedo.model;
 
 import swen222.cluedo.model.card.Room;
-import swen222.cluedo.model.Location;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class Board {
 
 
     public final Tile tiles[][];
-
-    public static class Tile {
-        public final Optional<Room> room;
-        public final Map<Direction, Location> adjacentLocations;
-        // two tiles are adjacent if there is no wall between them
-
-        public Tile(Optional<Room> room, Map<Direction, Location> adjacentLocations) {
-            this.room = room;
-            this.adjacentLocations = adjacentLocations;
-        }
-    }
+    public final int width, height;
+    private Map<Room, Location> _roomCentres = new HashMap<>();
 
     public Board(Path mapPath, int width, int height) throws IOException {
         List<String> lines = Files.readAllLines(mapPath);
         this.tiles = loadMap(lines, width, height);
+        this.width = width;
+        this.height = height;
     }
 
     /**
@@ -42,6 +34,49 @@ public class Board {
         return tiles[location.x][location.y];
     }
 
+    /**
+     * Finds the location that is in the middle of a room.
+     * @param room the room to look for
+     * @return the location of the central tile.
+     */
+    public Location centreLocationForRoom(Room room) {
+        Location centre = null;
+        if ((centre = _roomCentres.get(room)) != null) {
+            return centre;
+        }
+
+        int minX = this.width, maxX = -1, minY = this.height, maxY = -1;
+
+        int x = 0;
+        for (Tile[] column : this.tiles) {
+            int y = 0;
+            for (Tile tile : column) {
+                if (tile.room.isPresent() && tile.room.get() == room) {
+                    if (x < minX) {
+                        minX = x;
+                    }
+                    if (x > maxX) {
+                        maxX = x;
+                    }
+                    if (y < minY) {
+                        minY = y;
+                    }
+                    if (y > maxY) {
+                        maxY = y;
+                    }
+                }
+                y++;
+            }
+            x++;
+        }
+
+        centre = new Location((minX + maxX) / 2, (minY + maxY) / 2);
+        _roomCentres.put(room, centre);
+
+        System.out.printf("Centre of room %s is at %s, with bounds ((%d - %d), (%d - %d))\n", room, centre, minX, maxX, minY, maxY);
+        return centre;
+
+    }
 
     private Room roomForCharacter(char c) {
         switch (c) {
@@ -132,5 +167,16 @@ public class Board {
         this.linkTiles(loungePathTile, loungePathLocation, conservatoryPathTile, conservatoryPathLocation);
 
         return map;
+    }
+
+    public static class Tile {
+        public final Optional<Room> room;
+        public final Map<Direction, Location> adjacentLocations;
+        // two tiles are adjacent if there is no wall between them
+
+        public Tile(Optional<Room> room, Map<Direction, Location> adjacentLocations) {
+            this.room = room;
+            this.adjacentLocations = adjacentLocations;
+        }
     }
 }
