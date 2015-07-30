@@ -73,9 +73,16 @@ public class Board {
         centre = new Location((minX + maxX) / 2, (minY + maxY) / 2);
         _roomCentres.put(room, centre);
 
-        System.out.printf("Centre of room %s is at %s, with bounds ((%d - %d), (%d - %d))\n", room, centre, minX, maxX, minY, maxY);
         return centre;
 
+    }
+
+    /**
+     * Given two physically adjacent locations, returns whether there is a wall between them.
+     */
+    public boolean hasWallBetween(Location l1, Location l2) {
+        Tile t1 = this.tileAtLocation(l1);
+        return !t1.adjacentLocations.containsValue(l2);
     }
 
     private Room roomForCharacter(char c) {

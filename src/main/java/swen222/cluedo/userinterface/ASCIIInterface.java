@@ -79,6 +79,11 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
+    public void notifyStartOfTurn(Player player) {
+        this.out.printf("\n\n%s's turn. Your icon is %c.\n", player.character, this.asciiIconForCharacter(player.character));
+    }
+
+    @Override
     public void notifySuccess(Player player) {
         this.out.printf("%s has made a correct accusation and won!", player.character);
     }
@@ -110,15 +115,11 @@ public class ASCIIInterface implements CluedoInterface {
                 //Walls: above is [2x + 1][2y], left is [2x][2y + 1]
 
                 Board.Tile tile = board.tiles[x][y];
-                if (tile.adjacentLocations.get(Direction.Up) == null) {
+                if (board.hasWallBetween(new Location(x, y), new Location(x, y - 1))) { //if there's a wall above the tile.
                     buffer[2 * x + 1][2 * y] = '-';
                 }
-                if (tile.adjacentLocations.get(Direction.Left) == null) {
+                if (board.hasWallBetween(new Location(x, y), new Location(x - 1, y))) { //if there's a wall to the left of the tile.
                     buffer[2 * x][2 * y + 1] = '|';
-                }
-
-                if (tile.adjacentLocations.size() == 0) {
-                    buffer[2 * x + 1][2 * y + 1] = '\\';
                 }
             }
         }
@@ -196,17 +197,20 @@ public class ASCIIInterface implements CluedoInterface {
         if (userWantsToMakeAccusation == 'Y') {
             this.out.println("Choose your suspect:");
 
-            Stream<String> suspects = Arrays.stream(CluedoCharacter.values()).map(CluedoCharacter::toString);
+            Stream<String> suspects = Arrays.stream(CluedoCharacter.values()).filter(e -> !player.cards.contains(e))
+                    .map(CluedoCharacter::toString);
             CluedoCharacter suspect = CluedoCharacter.values()[this.selectOptionFromList(suspects)];
 
             this.out.println("Choose your weapon:");
 
-            Stream<String> weapons = Arrays.stream(Weapon.values()).map(Weapon::toString);
+            Stream<String> weapons = Arrays.stream(Weapon.values()).filter(e -> !player.cards.contains(e))
+                    .map(Weapon::toString);
             Weapon weapon = Weapon.values()[this.selectOptionFromList(weapons)];
 
             this.out.println("Choose your room:");
 
-            Stream<String> rooms = Arrays.stream(Room.values()).map(Room::toString);
+            Stream<String> rooms = Arrays.stream(Room.values()).filter(e -> !player.cards.contains(e))
+                    .map(Room::toString);
             Room room = Room.values()[this.selectOptionFromList(rooms)];
 
             return Optional.of(new Suggestion(suspect, weapon, room));
@@ -223,6 +227,7 @@ public class ASCIIInterface implements CluedoInterface {
 
         while (userWantsToMakeSuggestion != 'Y' && userWantsToMakeSuggestion != 'N') {
             this.out.println("Do you want to make an suggestion (Y/N)?");
+            this.out.println("Your cards are: " + player.cards);
             userWantsToMakeSuggestion = this.scanner.next().charAt(0);
         }
 

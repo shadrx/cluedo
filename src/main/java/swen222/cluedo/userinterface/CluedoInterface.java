@@ -15,6 +15,11 @@ public interface CluedoInterface {
     CluedoCharacter askToSelectACharacter(List<CluedoCharacter> availableCharacters);
 
     /**
+     * Notify that player is about to start their turn.
+     */
+    void notifyStartOfTurn(Player player);
+
+    /**
      * Notify the player that a successful accusation was made.
      *
      * @param player the player that made the successful accusation

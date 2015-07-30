@@ -91,6 +91,8 @@ public class GameState {
             int i = 0;
             for (Player player : players) {
 
+                player.cluedoInterface.notifyStartOfTurn(player);
+
                 if (this.checkForAccusation(players, player)) {
                     return;
                 }
