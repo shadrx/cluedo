@@ -20,6 +20,25 @@ public class ASCIIInterface implements CluedoInterface {
         this.out = out;
     }
 
+    private char asciiIconForCharacter(CluedoCharacter character) {
+        switch (character) {
+            case MissScarlet:
+                return 'S';
+            case ColonelMustard:
+                return 'M';
+            case MrsWhite:
+                return 'W';
+            case ReverendGreen:
+                return 'G';
+            case MrsPeacock:
+                return 'P';
+            case ProfessorPlum:
+                return 'L';
+            default:
+                return '\0';
+        }
+    }
+
     /**
      * Prints the list elements to the console, prepended by a number. Then, reads in a number from in and returns the index of the element selected.
      */
@@ -77,6 +96,67 @@ public class ASCIIInterface implements CluedoInterface {
     @Override
     public void showGameState(GameState gameState) {
         //TODO
+
+        Board board = gameState.board;
+
+        char[][] buffer = new char[2 * (board.width + 1)][2 * (board.height + 1)];
+        for (char[] line : buffer) {
+            Arrays.fill(line, ' ');
+        }
+
+        for (int x = 0; x < board.width; x++) {
+            for (int y = 0; y < board.height; y++) {
+                //The actual tile is at buffer[2x + 1][2y + 1]
+                //Walls: above is [2x + 1][2y], left is [2x][2y + 1]
+
+                Board.Tile tile = board.tiles[x][y];
+                if (tile.adjacentLocations.get(Direction.Up) == null) {
+                    buffer[2 * x + 1][2 * y] = '-';
+                }
+                if (tile.adjacentLocations.get(Direction.Left) == null) {
+                    buffer[2 * x][2 * y + 1] = '|';
+                }
+
+                if (tile.adjacentLocations.size() == 0) {
+                    buffer[2 * x + 1][2 * y + 1] = '\\';
+                }
+            }
+        }
+        for (int x = 0; x < board.width; x++) {
+            buffer[2 * x + 1][2 * board.height] = '-';
+        }
+        for (int y = 0; y < board.height; y++) {
+            buffer[2 * board.width][2 * y + 1] = '|';
+        }
+
+
+        for (Room room : Room.values()) {
+            Location centre = board.centreLocationForRoom(room);
+            String name = room.toString();
+
+            int startX = 2 * centre.x + 1 - name.length() / 2;
+            int y = 2 * centre.y + 1;
+
+            for (int i = 0; i < +name.length(); i++) {
+                buffer[startX + i][y] = name.charAt(i);
+            }
+
+        }
+
+
+        for (Player player : gameState.allPlayers) {
+            CluedoCharacter character = player.character;
+            Location location = player.location();
+            buffer[2 * location.x + 1][2 * location.y + 1] = this.asciiIconForCharacter(character);
+        }
+
+        for (int y = 0; y < 2 * (board.height + 1); y++) {
+            for (int x = 0; x < 2 * (board.width + 1); x++) {
+                this.out.print(buffer[x][y]);
+            }
+            this.out.print('\n');
+        }
+
     }
 
     @Override
