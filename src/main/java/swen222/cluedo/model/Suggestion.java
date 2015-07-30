@@ -1,9 +1,9 @@
 package swen222.cluedo.model;
 
-import org.jetbrains.annotations.NotNull;
+
+import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import swen222.cluedo.model.card.Weapon;
-import swen222.cluedo.model.card.CluedoCharacter;
 
 
 /**
@@ -14,16 +14,13 @@ import swen222.cluedo.model.card.CluedoCharacter;
  */
 public class Suggestion {
 
-    @NotNull
     public final CluedoCharacter character;
 
-    @NotNull
     public final Weapon weapon;
 
-    @NotNull
     public final Room room;
 
-    public Suggestion(@NotNull CluedoCharacter character, @NotNull Weapon weapon, @NotNull Room room) {
+    public Suggestion(CluedoCharacter character, Weapon weapon, Room room) {
         this.character = character;
         this.weapon = weapon;
         this.room = room;
