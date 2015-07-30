@@ -2,6 +2,7 @@ package swen222.cluedo.model;
 
 import swen222.cluedo.model.card.Room;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public class GameState {
      */
     private List<Player> otherPlayersFrom(Player player) {
         int index = allPlayers.indexOf(player);
-        List<Player> retVal = this.allPlayers.subList(index + 1, allPlayers.size());
+        List<Player> retVal = new ArrayList<>(this.allPlayers.subList(index + 1, allPlayers.size()));
         retVal.addAll(this.allPlayers.subList(0, index));
         return retVal;
     }
@@ -55,7 +56,7 @@ public class GameState {
                 }
 
                 int i = playersInPlay.indexOf(player);
-                List<Player> newPlayers = playersInPlay.subList(i + 1, playersInPlay.size());
+                List<Player> newPlayers = new ArrayList<>(playersInPlay.subList(i + 1, playersInPlay.size()));
                 newPlayers.addAll(playersInPlay.subList(0, i)); //The play loop now starts from the next player and skips over the player who made the incorrect accusation.
                 this.gameLoop(newPlayers);
             }
