@@ -59,10 +59,10 @@ public class ASCIIInterface implements CluedoInterface {
 
     @Override
     public int getNumberOfPlayers(int min, int max) {
-        this.out.printf("How many players (%d - %d)?\n", min, max);
 
         int numPlayers = 0;
         while (numPlayers < min || numPlayers > max) {
+            this.out.printf("How many players (%d - %d)?\n", min, max);
             numPlayers = this.scanner.nextInt();
         }
         return numPlayers;
@@ -85,12 +85,12 @@ public class ASCIIInterface implements CluedoInterface {
 
     @Override
     public void notifySuccess(Player player) {
-        this.out.printf("%s has made a correct accusation and won!", player.character);
+        this.out.printf("%s has made a correct accusation and won!\n", player.character);
     }
 
     @Override
     public void notifyFailure(Player player) {
-        this.out.printf("%s has made an incorrect accusation and is no longer in the game.", player.character);
+        this.out.printf("%s has made an incorrect accusation and is no longer in the game.\n", player.character);
     }
 
     @Override

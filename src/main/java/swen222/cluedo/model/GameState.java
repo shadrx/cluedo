@@ -1,6 +1,7 @@
 package swen222.cluedo.model;
 
 import swen222.cluedo.model.card.Room;
+import swen222.cluedo.userinterface.CluedoInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,12 +48,20 @@ public class GameState {
         Optional<Suggestion> accusation = player.cluedoInterface.requestPlayerAccusation(player);
         if (accusation.isPresent()) {
             if (accusation.get().equals(this.solution)) {
+                CluedoInterface cI = null;
                 for (Player p : this.allPlayers) {
-                    p.cluedoInterface.notifySuccess(player);
+                    if (p.cluedoInterface != cI) { //don't notify the same interface object multiple times.
+                        p.cluedoInterface.notifySuccess(player);
+                        cI = p.cluedoInterface;
+                    }
                 }
             } else {
+                CluedoInterface cI = null;
                 for (Player p : this.allPlayers) {
-                    p.cluedoInterface.notifyFailure(player);
+                    if (p.cluedoInterface != cI) { //don't notify the same interface object multiple times.
+                        p.cluedoInterface.notifyFailure(player);
+                        cI = p.cluedoInterface;
+                    }
                 }
 
                 int i = playersInPlay.indexOf(player);
