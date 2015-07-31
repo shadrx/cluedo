@@ -7,4 +7,14 @@ public enum Weapon implements Card {
     Revolver,
     Rope,
     Spanner;
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case LeadPipe:
+                return "Lead Pipe";
+            default:
+                return super.toString();
+        }
+    }
 }

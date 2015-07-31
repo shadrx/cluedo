@@ -133,7 +133,7 @@ public class ASCIIInterface implements CluedoInterface {
 
         for (Room room : Room.values()) {
             Location centre = board.centreLocationForRoom(room);
-            String name = room.toString();
+            String name = room.shortName();
 
             int startX = 2 * centre.x + 1 - name.length() / 2;
             int y = 2 * centre.y + 1;
@@ -259,6 +259,6 @@ public class ASCIIInterface implements CluedoInterface {
 
     @Override
     public void notifyPlayerResponse(Player player, SuggestionResponse response) {
-        this.out.printf("%s: %s", player.character, response);
+        this.out.printf("%To s: %s", player.character, response);
     }
 }

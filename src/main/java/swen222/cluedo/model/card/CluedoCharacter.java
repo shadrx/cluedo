@@ -28,4 +28,24 @@ public enum CluedoCharacter implements Card {
                 return null;
         }
     }
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case MissScarlet:
+                return "Miss Scarlet";
+            case ColonelMustard:
+                return "Colonel Mustard";
+            case MrsWhite:
+                return "Mrs. White";
+            case ReverendGreen:
+                return "Reverend Green";
+            case MrsPeacock:
+                return "Mrs. Peacock";
+            case ProfessorPlum:
+                return "Professor Plum";
+            default:
+                return null;
+        }
+    }
 }
