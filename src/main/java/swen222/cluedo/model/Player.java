@@ -50,7 +50,7 @@ public class Player {
      * @param suggestion The suggestion that the player is responding to
      * @return A list containing all the possible responses that this player may give. May be empty.
      */
-    List<SuggestionResponse> possibleResponses(Suggestion suggestion) {
+    public List<SuggestionResponse> possibleResponses(Suggestion suggestion) {
         List<SuggestionResponse> responses = new ArrayList<>(3);
 
         if (this.cards.contains(suggestion.character)) {
