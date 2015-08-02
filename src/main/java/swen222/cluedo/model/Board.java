@@ -40,7 +40,7 @@ public class Board {
      * @return the location of the central tile.
      */
     public Location centreLocationForRoom(Room room) {
-        Location centre = null;
+        Location centre;
         if ((centre = _roomCentres.get(room)) != null) {
             return centre;
         }
@@ -101,7 +101,7 @@ public class Board {
     }
 
     private Map<Direction, Location> adjacentLocations(int mask, int locationX, int locationY) {
-        Map<Direction, Location> adjacentLocations = new HashMap<Direction, Location>(4);
+        Map<Direction, Location> adjacentLocations = new HashMap<>(4);
         if ((mask & 1) != 0) {
             adjacentLocations.put(Direction.Left, new Location(locationX - 1, locationY));
         }

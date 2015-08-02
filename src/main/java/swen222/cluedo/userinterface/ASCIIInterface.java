@@ -114,7 +114,6 @@ public class ASCIIInterface implements CluedoInterface {
                 //The actual tile is at buffer[2x + 1][2y + 1]
                 //Walls: above is [2x + 1][2y], left is [2x][2y + 1]
 
-                Board.Tile tile = board.tiles[x][y];
                 if (board.hasWallBetween(new Location(x, y), new Location(x, y - 1))) { //if there's a wall above the tile.
                     buffer[2 * x + 1][2 * y] = '-';
                 }
@@ -259,6 +258,6 @@ public class ASCIIInterface implements CluedoInterface {
 
     @Override
     public void notifyPlayerResponse(Player player, SuggestionResponse response) {
-        this.out.printf("%To s: %s", player.character, response);
+        this.out.printf("To %s: %s", player.character, response);
     }
 }
