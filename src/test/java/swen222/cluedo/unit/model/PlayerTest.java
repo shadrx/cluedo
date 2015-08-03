@@ -2,6 +2,7 @@ package swen222.cluedo.unit.model;
 
 import org.junit.Before;
 import org.junit.Test;
+import swen222.cluedo.model.Location;
 import swen222.cluedo.model.Player;
 import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.SuggestionResponse;
@@ -29,6 +30,14 @@ public class PlayerTest {
 
 
         this.player = new Player(CluedoCharacter.ColonelMustard, cards, null);
+    }
+
+    @Test
+    public void testLocationSetterUpdatesLocation() {
+        Location newLocation = new Location(0, 0);
+        player.setLocation(newLocation);
+
+        assertEquals(newLocation, player.location());
     }
 
     @Test

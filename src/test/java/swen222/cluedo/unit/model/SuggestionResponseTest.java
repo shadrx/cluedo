@@ -1,6 +1,8 @@
 package swen222.cluedo.unit.model;
 
 import org.junit.Test;
+import swen222.cluedo.model.Location;
+import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.SuggestionResponse;
 import swen222.cluedo.model.card.CluedoCharacter;
 
@@ -31,5 +33,17 @@ public class SuggestionResponseTest {
         SuggestionResponse differentResponseTwo = new SuggestionResponse(SuggestionResponse.Type.DisproveCharacter, CluedoCharacter.MissScarlet);
 
         assertNotEquals(differentResponseOne, differentResponseTwo);
+    }
+
+    @Test
+    public void responseShouldOnlyBeEqualToClassOfSameType() {
+        SuggestionResponse suggestionResponse = new SuggestionResponse(SuggestionResponse.Type.DisproveCharacter, CluedoCharacter.ColonelMustard);
+        assertNotEquals(suggestionResponse, new Location(5, 7));
+    }
+
+    @Test
+    public void responseNotEqualToNull() {
+        SuggestionResponse suggestionResponse = new SuggestionResponse(SuggestionResponse.Type.DisproveCharacter, CluedoCharacter.ColonelMustard);
+        assertNotEquals(suggestionResponse, null);
     }
 }
