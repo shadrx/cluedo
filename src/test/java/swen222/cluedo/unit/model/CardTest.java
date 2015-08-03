@@ -10,6 +10,9 @@ import swen222.cluedo.model.card.Weapon;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class CardTest {
 
     @Test
@@ -19,7 +22,7 @@ public class CardTest {
         for (int i = 0; i < hands.length - 1; i++) {
             Set<Card> intersection = new HashSet<>(hands[0]);
             intersection.retainAll(hands[1]);
-            assert (intersection.size() == 0);
+            assertEquals(0, intersection.size());
         }
     }
 
@@ -29,9 +32,9 @@ public class CardTest {
         Set<Card>[] hands = Card.dealHands(4, suggestion);
 
         for (Set<Card> hand : hands) {
-            assert (!hand.contains(suggestion.character));
-            assert (!hand.contains(suggestion.weapon));
-            assert (!hand.contains(suggestion.room));
+            assertFalse(hand.contains(suggestion.character));
+            assertFalse(hand.contains(suggestion.weapon));
+            assertFalse(hand.contains(suggestion.room));
         }
     }
 }
