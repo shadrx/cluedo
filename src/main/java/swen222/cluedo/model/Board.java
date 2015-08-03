@@ -176,6 +176,28 @@ public class Board {
         return map;
     }
 
+    /**
+     * Recursively finds the new location given a move sequence from a start location
+     *
+     * @param move          A sequence of directions in which the user wishes to move
+     * @param startLocation the location from which this move sequence goes
+     * @return The new location, if the move sequence is valid; else, the empty optional.
+     */
+    public Optional<Location> newLocationForMove(List<Direction> move, Location startLocation) {
+        if (move.size() > 0) {
+            Direction head = move.get(0);
+            Board.Tile tile = this.tileAtLocation(startLocation);
+            Location nextLocationOrNull = tile.adjacentLocations.get(head);
+
+            if (nextLocationOrNull == null) {
+                return Optional.empty();
+            }
+            List<Direction> tail = move.subList(1, move.size());
+            return newLocationForMove(tail, nextLocationOrNull);
+        }
+        return Optional.of(startLocation);
+    }
+
     public static class Tile {
         public final Optional<Room> room;
         public final Map<Direction, Location> adjacentLocations;

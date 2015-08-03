@@ -33,7 +33,17 @@ public class SuggestionResponse {
         }
     }
 
-    enum Type {
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof SuggestionResponse)) {
+            return false;
+        }
+
+        SuggestionResponse otherResponse = (SuggestionResponse) other;
+        return otherResponse.type == this.type && otherResponse.card.equals(this.card);
+    }
+
+    public enum Type {
         DisproveCharacter,
         DisproveWeapon,
         DisproveRoom,

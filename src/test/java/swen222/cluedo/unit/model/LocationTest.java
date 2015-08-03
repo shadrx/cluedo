@@ -4,6 +4,7 @@ import org.junit.Test;
 import swen222.cluedo.model.Location;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class LocationTest {
 
@@ -21,8 +22,8 @@ public class LocationTest {
         for (int i = 0; i < 20; i++) {
             int x = (int) (Math.random() * 25);
             int y = (int) (Math.random() * 25);
-            assertEquals(new Location(x, y), new Location(x + 1, y));
-            assertEquals(new Location(x, y), new Location(x, y + 1));
+            assertNotEquals(new Location(x, y), new Location(x + 1, y));
+            assertNotEquals(new Location(x, y), new Location(x, y + 1));
         }
     }
 }

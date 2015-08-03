@@ -28,7 +28,7 @@ public class PlayerTest {
         cards.add(Room.Ballroom);
 
 
-        this.player = new Player(null, cards, null);
+        this.player = new Player(CluedoCharacter.ColonelMustard, cards, null);
     }
 
     @Test

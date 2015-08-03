@@ -8,9 +8,11 @@ import swen222.cluedo.model.Location;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.Assert.*;
 
 public class MapTest {
     private Board board = null;
@@ -62,6 +64,31 @@ public class MapTest {
             x++;
         }
 
+    }
 
+    @Test
+    public void testInvalidMoveReturnsInvalid() {
+        List<Direction> move = Arrays.asList(Direction.Up, Direction.Up, Direction.Up);
+
+        assertFalse(board.newLocationForMove(move, new Location(0, 0)).isPresent());
+    }
+
+    @Test
+    public void testValidMoveReturnsValid() {
+        List<Direction> move = Arrays.asList(Direction.Right, Direction.Right, Direction.Up, Direction.Up, Direction.Left, Direction.Left);
+        Location startLocation = new Location(4, 17);
+        Location endLocation = new Location(4, 15);
+
+        assertEquals(board.newLocationForMove(move, startLocation).get(), endLocation);
+    }
+
+    @Test
+    public void testConnectedRoomsHaveNoWallBetweenThem() {
+        assertFalse(board.hasWallBetween(new Location(4, 6), new Location(4, 7)));
+    }
+
+    @Test
+    public void testDisconnectedRoomsHaveWallsBetweenThem() {
+        assertTrue(board.hasWallBetween(new Location(3, 6), new Location(3, 7)));
     }
 }
