@@ -99,10 +99,8 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public void showGameState(GameState gameState) {
-        //TODO
-
-        Board board = gameState.board;
+    public void showGame(Game game) {
+        Board board = game.board;
 
         char[][] buffer = new char[2 * (board.width + 1)][2 * (board.height + 1)];
         for (char[] line : buffer) {
@@ -144,7 +142,7 @@ public class ASCIIInterface implements CluedoInterface {
         }
 
 
-        for (Player player : gameState.allPlayers) {
+        for (Player player : game.allPlayers) {
             CluedoCharacter character = player.character;
             Location location = player.location();
             buffer[2 * location.x + 1][2 * location.y + 1] = this.asciiIconForCharacter(character);

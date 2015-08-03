@@ -1,7 +1,7 @@
 package swen222.cluedo;
 
 import swen222.cluedo.model.Board;
-import swen222.cluedo.model.GameState;
+import swen222.cluedo.model.Game;
 import swen222.cluedo.model.Player;
 import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.card.Card;
@@ -48,9 +48,9 @@ class Cluedo {
         }
 
 
-        GameState gameState = new GameState(board, solution, players);
+        Game game = new Game(board, solution, players);
 
-        gameState.gameLoop(gameState.allPlayers);
+        game.gameLoop(game.allPlayers);
 
     }
 }

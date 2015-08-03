@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class GameState {
+public class Game {
     public final Board board;
     public final Suggestion solution;
     public final List<Player> allPlayers;
 
-    public GameState(Board board, Suggestion solution, List<Player> players) {
+    public Game(Board board, Suggestion solution, List<Player> players) {
         this.board = board;
         this.solution = solution;
         this.allPlayers = players;
@@ -98,7 +98,6 @@ public class GameState {
         }
 
         while (true) {
-            int i = 0;
             for (Player player : players) {
 
                 player.cluedoInterface.notifyStartOfTurn(player);
@@ -107,7 +106,7 @@ public class GameState {
                     return;
                 }
 
-                player.cluedoInterface.showGameState(this);
+                player.cluedoInterface.showGame(this);
 
                 int diceRoll = (int)(Math.floor(Math.random() * 6) + 1);
 
@@ -123,8 +122,6 @@ public class GameState {
                 if (tile.room.isPresent()) {
                     this.checkForSuggestion(player, tile.room.get());
                 }
-
-                i++;
             }
         }
     }

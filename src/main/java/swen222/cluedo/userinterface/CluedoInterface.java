@@ -53,12 +53,12 @@ public interface CluedoInterface {
 
 
     /**
-     * Display the game state in a manner fitting to this implementation. For instance,
+     * Display the game in a manner fitting to this implementation. For instance,
      * a text-based implementation might print an ASCII map; a GUI based application would update its GUI.
      *
-     * @param gameState The current game state.
+     * @param game The current game.
      */
-    void showGameState(GameState gameState);
+    void showGame(Game game);
 
     /**
      * Request a movement on the board that is exactly the given distance.
