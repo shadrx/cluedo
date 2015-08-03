@@ -1,7 +1,7 @@
 package swen222.cluedo.model;
 
 import swen222.cluedo.model.card.Room;
-import swen222.cluedo.userinterface.CluedoInterface;
+import swen222.cluedo.CluedoInterface;
 
 import java.util.ArrayList;
 import java.util.List;

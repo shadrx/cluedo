@@ -6,8 +6,7 @@ import swen222.cluedo.model.Player;
 import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
-import swen222.cluedo.userinterface.ASCIIInterface;
-import swen222.cluedo.userinterface.CluedoInterface;
+import swen222.cluedo.asciiinterface.ASCIIInterface;
 
 import java.io.IOException;
 import java.nio.file.Paths;

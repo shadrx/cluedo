@@ -1,4 +1,4 @@
-package swen222.cluedo.userinterface;
+package swen222.cluedo;
 
 import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;

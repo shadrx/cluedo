@@ -1,11 +1,13 @@
-package swen222.cluedo.userinterface;
+package swen222.cluedo.asciiinterface;
 
+import swen222.cluedo.CluedoInterface;
 import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import swen222.cluedo.model.card.Weapon;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Stream;
@@ -15,9 +17,9 @@ public class ASCIIInterface implements CluedoInterface {
     private Scanner scanner;
     private PrintStream out;
 
-    public ASCIIInterface(InputStream in, PrintStream out) {
+    public ASCIIInterface(InputStream in, OutputStream out) {
         this.scanner = new Scanner(in);
-        this.out = out;
+        this.out = new PrintStream(out);
     }
 
     private char asciiIconForCharacter(CluedoCharacter character) {
