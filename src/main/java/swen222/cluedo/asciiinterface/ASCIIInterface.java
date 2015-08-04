@@ -54,7 +54,11 @@ public class ASCIIInterface implements CluedoInterface {
 
         int option = -1;
         while (option <= 0 || option > i - 1) { //since i == numItems + 1
-            option = this.scanner.nextInt();
+            try {
+                option = this.scanner.nextInt();
+            } catch (InputMismatchException e) {
+                option = -1;
+            }
         }
         return option - 1;
     }
@@ -65,7 +69,11 @@ public class ASCIIInterface implements CluedoInterface {
         int numPlayers = 0;
         while (numPlayers < min || numPlayers > max) {
             this.out.printf("How many players (%d - %d)?\n", min, max);
-            numPlayers = this.scanner.nextInt();
+            try {
+                numPlayers = this.scanner.nextInt();
+            } catch (InputMismatchException e) {
+                numPlayers = 0;
+            }
         }
         return numPlayers;
     }
