@@ -58,6 +58,7 @@ public class ASCIIInterface implements CluedoInterface {
                 option = this.scanner.nextInt();
             } catch (InputMismatchException e) {
                 option = -1;
+                this.scanner.next();
             }
         }
         return option - 1;
@@ -73,6 +74,7 @@ public class ASCIIInterface implements CluedoInterface {
                 numPlayers = this.scanner.nextInt();
             } catch (InputMismatchException e) {
                 numPlayers = 0;
+                this.scanner.next();
             }
         }
         return numPlayers;
