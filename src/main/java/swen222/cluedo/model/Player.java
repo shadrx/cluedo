@@ -26,6 +26,17 @@ public class Player {
         this.cluedoInterface = cluedoInterface;
     }
 
+    public Player(Player player) {
+        this.character = player.character;
+        this.cards = player.cards;
+        this.location = player.location.copy();
+        this.cluedoInterface = player.cluedoInterface;
+    }
+
+    public Player copy() {
+        return new Player(this);
+    }
+
     /**
      * Get the location of this player.
      *

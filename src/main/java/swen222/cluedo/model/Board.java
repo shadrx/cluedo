@@ -5,10 +5,8 @@ import swen222.cluedo.model.card.Room;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class Board {
 
@@ -83,6 +81,72 @@ public class Board {
     public boolean hasWallBetween(Location l1, Location l2) {
         Tile t1 = this.tileAtLocation(l1);
         return !t1.adjacentLocations.containsValue(l2);
+    }
+
+    private class DijkstraNode {
+        public int distanceFromSource = Integer.MAX_VALUE;
+        public Optional<Location> previousLocation = Optional.empty();
+    }
+
+    private Location[] reconstructPath(Location endLocation, DijkstraNode[][] nodeData, int distance) {
+        Location[] path = new Location[distance + 1];
+
+        Location location = endLocation;
+
+        for (int i = distance; i >= 0; i--) {
+            path[i] = location;
+            location = nodeData[location.x][location.y].previousLocation.orElse(null);
+        }
+
+        return path;
+    }
+
+    public Set<Location[]> pathsFromLocation(Location location, int maxDistance, Stream<Location> blockedLocations) {
+        Set<Location[]> paths = new HashSet<>();
+
+        DijkstraNode[][] nodeData = new DijkstraNode[this.width][this.height];
+        for (DijkstraNode[] column : nodeData) {
+            Arrays.fill(column, new DijkstraNode());
+        }
+
+        nodeData[location.x][location.y].distanceFromSource = 0;
+
+        PriorityQueue<Location> queue = new PriorityQueue<>(new Comparator<Location>() {
+            @Override
+            public int compare(Location l1, Location l2) {
+                return nodeData[l1.x][l1.y].distanceFromSource - nodeData[l2.x][l2.y].distanceFromSource;
+            }
+        });
+
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                queue.add(new Location(x, y));
+            }
+        }
+
+        while (!queue.isEmpty()) {
+            Location currentLocation = queue.poll();
+            for (Location neighbour : this.tileAtLocation(currentLocation).adjacentLocations.values()) {
+                if (blockedLocations.anyMatch(location1 -> location1.equals(neighbour))) {
+                    continue;
+                }
+
+                int distance = nodeData[currentLocation.x][currentLocation.y].distanceFromSource + 1;
+
+                if (distance > maxDistance) {
+                    return paths;
+                }
+
+                if (distance < nodeData[neighbour.x][neighbour.y].distanceFromSource) {
+                    nodeData[neighbour.x][neighbour.y].distanceFromSource = distance;
+                    nodeData[neighbour.x][neighbour.y].previousLocation = Optional.of(currentLocation);
+
+                    paths.add(this.reconstructPath(neighbour, nodeData, distance));
+                }
+
+            }
+        }
+        return paths;
     }
 
     private Room roomForCharacter(char c) {
@@ -183,7 +247,10 @@ public class Board {
      * @param startLocation the location from which this move sequence goes
      * @return The new location, if the move sequence is valid; else, the empty optional.
      */
-    public Optional<Location> newLocationForMove(List<Direction> move, Location startLocation) {
+    public Optional<Location> newLocationForMove(List<Direction> move, Location startLocation, Stream<Location> blockedLocations) {
+        if (blockedLocations.anyMatch(location -> location.equals(startLocation))) {
+            return Optional.empty();
+        }
         if (move.size() > 0) {
             Direction head = move.get(0);
             Board.Tile tile = this.tileAtLocation(startLocation);
@@ -193,7 +260,7 @@ public class Board {
                 return Optional.empty();
             }
             List<Direction> tail = move.subList(1, move.size());
-            return newLocationForMove(tail, nextLocationOrNull);
+            return newLocationForMove(tail, nextLocationOrNull, blockedLocations);
         }
         return Optional.of(startLocation);
     }

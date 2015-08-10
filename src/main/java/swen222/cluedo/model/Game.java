@@ -6,6 +6,7 @@ import swen222.cluedo.CluedoInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class Game {
     public final Board board;
@@ -113,7 +114,9 @@ public class Game {
                 Optional<Location> newLocation = Optional.empty();
                 while (!newLocation.isPresent()) {
                     List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, diceRoll);
-                    newLocation = this.board.newLocationForMove(moveSequence, player.location());
+                    Stream<Location> otherPlayerLocations = players.stream().filter(player1 -> player1 != player)
+                            .map(player2 -> player2.location());
+                    newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);
                 }
                 player.setLocation(newLocation.get());
 

@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -70,7 +71,7 @@ public class MapTest {
     public void testInvalidMoveReturnsInvalid() {
         List<Direction> move = Arrays.asList(Direction.Up, Direction.Up, Direction.Up);
 
-        assertFalse(board.newLocationForMove(move, new Location(0, 0)).isPresent());
+        assertFalse(board.newLocationForMove(move, new Location(0, 0), Stream.<Location>empty()).isPresent());
     }
 
     @Test
@@ -79,7 +80,7 @@ public class MapTest {
         Location startLocation = new Location(4, 17);
         Location endLocation = new Location(4, 15);
 
-        assertEquals(board.newLocationForMove(move, startLocation).get(), endLocation);
+        assertEquals(board.newLocationForMove(move, startLocation, Stream.<Location>empty()).get(), endLocation);
     }
 
     @Test

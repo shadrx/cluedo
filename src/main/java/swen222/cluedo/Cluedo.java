@@ -1,5 +1,6 @@
 package swen222.cluedo;
 
+import swen222.cluedo.gui.CluedoFrame;
 import swen222.cluedo.model.Board;
 import swen222.cluedo.model.Game;
 import swen222.cluedo.model.Player;
@@ -18,6 +19,7 @@ import java.util.Set;
 class Cluedo {
 
     public static void main(String[] args) {
+
         //Get the number of players
         CluedoInterface cluedoInterface = new ASCIIInterface(System.in, System.out);
 
@@ -49,7 +51,11 @@ class Cluedo {
 
         Game game = new Game(board, solution, players);
 
+        CluedoFrame frame = new CluedoFrame();
+        frame.canvas.setGameState(game);
+
         game.gameLoop(game.allPlayers);
+
 
     }
 }
