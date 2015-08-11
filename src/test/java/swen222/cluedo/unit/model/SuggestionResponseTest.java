@@ -38,7 +38,7 @@ public class SuggestionResponseTest {
     @Test
     public void responseShouldOnlyBeEqualToClassOfSameType() {
         SuggestionResponse suggestionResponse = new SuggestionResponse(SuggestionResponse.Type.DisproveCharacter, CluedoCharacter.ColonelMustard);
-        assertNotEquals(suggestionResponse, new Location(5, 7));
+        assertNotEquals(suggestionResponse, new Location<>(5, 7));
     }
 
     @Test

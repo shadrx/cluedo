@@ -111,11 +111,11 @@ public class Game {
 
                 int diceRoll = (int)(Math.floor(Math.random() * 6) + 1);
 
-                Optional<Location> newLocation = Optional.empty();
+                Optional<Location<Integer>> newLocation = Optional.empty();
                 while (!newLocation.isPresent()) {
                     List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, diceRoll);
-                    Stream<Location> otherPlayerLocations = players.stream().filter(player1 -> player1 != player)
-                            .map(player2 -> player2.location());
+                    Stream<Location<Integer>> otherPlayerLocations = players.stream().filter(player1 -> player1 != player)
+                            .map(Player::location);
                     newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);
                 }
                 player.setLocation(newLocation.get());

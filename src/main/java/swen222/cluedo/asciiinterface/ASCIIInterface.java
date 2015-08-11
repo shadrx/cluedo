@@ -6,6 +6,7 @@ import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import swen222.cluedo.model.card.Weapon;
 
+import javax.swing.text.html.Option;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -124,10 +125,10 @@ public class ASCIIInterface implements CluedoInterface {
                 //The actual tile is at buffer[2x + 1][2y + 1]
                 //Walls: above is [2x + 1][2y], left is [2x][2y + 1]
 
-                if (board.hasWallBetween(new Location(x, y), new Location(x, y - 1))) { //if there's a wall above the tile.
+                if (board.hasWallBetween(new Location<>(x, y), new Location<>(x, y - 1))) { //if there's a wall above the tile.
                     buffer[2 * x + 1][2 * y] = '-';
                 }
-                if (board.hasWallBetween(new Location(x, y), new Location(x - 1, y))) { //if there's a wall to the left of the tile.
+                if (board.hasWallBetween(new Location<>(x, y), new Location<>(x - 1, y))) { //if there's a wall to the left of the tile.
                     buffer[2 * x][2 * y + 1] = '|';
                 }
             }
@@ -141,11 +142,11 @@ public class ASCIIInterface implements CluedoInterface {
 
 
         for (Room room : Room.values()) {
-            Location centre = board.centreLocationForRoom(room);
+            Location<Float> centre = board.centreLocationForRoom(room);
             String name = room.shortName();
 
-            int startX = 2 * centre.x + 1 - name.length() / 2;
-            int y = 2 * centre.y + 1;
+            int startX = 2 * centre.x.intValue() + 1 - name.length() / 2;
+            int y = 2 * centre.y.intValue() + 1;
 
             for (int i = 0; i < +name.length(); i++) {
                 buffer[startX + i][y] = name.charAt(i);
@@ -156,7 +157,7 @@ public class ASCIIInterface implements CluedoInterface {
 
         for (Player player : game.allPlayers) {
             CluedoCharacter character = player.character;
-            Location location = player.location();
+            Location<Integer> location = player.location();
             buffer[2 * location.x + 1][2 * location.y + 1] = this.asciiIconForCharacter(character);
         }
 

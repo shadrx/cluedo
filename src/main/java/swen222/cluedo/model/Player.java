@@ -17,7 +17,7 @@ public class Player {
      */
     public final CluedoInterface cluedoInterface;
     public final Set<Card> cards;
-    private Location location;
+    private Location<Integer> location;
 
     public Player(CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
         this.character = character;
@@ -42,7 +42,7 @@ public class Player {
      *
      * @return the location of this player
      */
-    public Location location() {
+    public Location<Integer> location() {
         return location;
     }
 
@@ -51,7 +51,7 @@ public class Player {
      *
      * @param location the location to set
      */
-    public void setLocation(Location location) {
+    public void setLocation(Location<Integer> location) {
         this.location = location;
     }
 

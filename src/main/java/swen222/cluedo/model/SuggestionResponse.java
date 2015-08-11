@@ -27,9 +27,9 @@ public class SuggestionResponse {
             case DisproveWeapon:
                 return "The " + this.card + " was not used in the crime.";
             case DisproveRoom:
-                return "The crime was not commited in the " + this.card + ".";
+                return "The crime was not committed in the " + this.card + ".";
             default:
-                return null;
+                return "No one is able to refute your suggestion.";
         }
     }
 

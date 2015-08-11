@@ -1,17 +1,19 @@
 package swen222.cluedo.model;
 
 
-public class Location {
-    public final int x;
-    public final int y;
+import java.util.Objects;
 
-    public Location(int x, int y) {
+public class Location<T extends Number> {
+    public final T x;
+    public final T y;
+
+    public Location(T x, T y) {
         this.x = x;
         this.y = y;
     }
 
-    public Location copy() {
-        return new Location(this.x, this.y);
+    public Location<T> copy() {
+        return new Location<>(this.x, this.y);
     }
 
     @Override
@@ -21,13 +23,13 @@ public class Location {
 
         Location location = (Location) o;
 
-        return x == location.x && y == location.y;
+        return x.equals(location.x) && y.equals(location.y);
     }
 
     @Override
     public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
+        int result = x.hashCode();
+        result = 31 * result + y.hashCode();
         return result;
     }
 

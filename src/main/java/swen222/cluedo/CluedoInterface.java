@@ -70,7 +70,6 @@ public interface CluedoInterface {
     List<Direction> requestPlayerMove(Player player, int distance);
 
 
-
     /**
      * Request an accusation from this player.
      *
@@ -80,8 +79,6 @@ public interface CluedoInterface {
      * @return an accusation from this player or null if no accusation is made
      */
     Optional<Suggestion> requestPlayerAccusation(Player player);
-
-
 
     /**
      * Request a suggestion from a player that uses the given room.

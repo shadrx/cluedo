@@ -34,7 +34,7 @@ public class PlayerTest {
 
     @Test
     public void testLocationSetterUpdatesLocation() {
-        Location newLocation = new Location(0, 0);
+        Location<Integer> newLocation = new Location<>(0, 0);
         player.setLocation(newLocation);
 
         assertEquals(newLocation, player.location());

@@ -12,7 +12,7 @@ public class LocationTest {
     @Test
     public void testLocationCanHavePositiveCoordinates() {
         try {
-            new Location(5, 5);
+            new Location<>(5, 5);
         } catch (IllegalArgumentException e) {
             fail("Should be able to create location with positive coordinates");
         }
@@ -23,7 +23,7 @@ public class LocationTest {
         for (int i = 0; i < 20; i++) {
             int x = (int) (Math.random() * 25);
             int y = (int) (Math.random() * 25);
-            assertEquals(new Location(x, y), new Location(x, y));
+            assertEquals(new Location<>(x, y), new Location<>(x, y));
         }
     }
 
@@ -32,8 +32,8 @@ public class LocationTest {
         for (int i = 0; i < 20; i++) {
             int x = (int) (Math.random() * 25);
             int y = (int) (Math.random() * 25);
-            assertNotEquals(new Location(x, y), new Location(x + 1, y));
-            assertNotEquals(new Location(x, y), new Location(x, y + 1));
+            assertNotEquals(new Location<>(x, y), new Location<>(x + 1, y));
+            assertNotEquals(new Location<>(x, y), new Location<>(x, y + 1));
         }
     }
 }

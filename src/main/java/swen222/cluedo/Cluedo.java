@@ -54,7 +54,7 @@ class Cluedo {
         CluedoFrame frame = new CluedoFrame();
         frame.canvas.setGameState(game);
 
-        game.gameLoop(game.allPlayers);
+      //  game.gameLoop(game.allPlayers);
 
 
     }

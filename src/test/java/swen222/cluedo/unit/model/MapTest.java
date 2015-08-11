@@ -47,12 +47,12 @@ public class MapTest {
         for (Board.Tile[] column : this.board.tiles) {
             int y = 0;
             for (Board.Tile tile : column) {
-                Location tileLocation = new Location(x, y);
-                for (Map.Entry<Direction, Location> entry : tile.adjacentLocations.entrySet()) {
+                Location<Integer> tileLocation = new Location<>(x, y);
+                for (Map.Entry<Direction, Location<Integer>> entry : tile.adjacentLocations.entrySet()) {
                     Board.Tile other = board.tileAtLocation(entry.getValue());
                     Direction oppositeDirection = this.oppositeDirection(entry.getKey());
 
-                    Location returnedLocation = other.adjacentLocations.get(oppositeDirection);
+                    Location<Integer> returnedLocation = other.adjacentLocations.get(oppositeDirection);
                     String message = String.format("Looking at tile at %d, %d in the direction %s",x, y, entry.getKey());
 
                     assertNotNull(message + ". The returned location should not be null.", returnedLocation);
@@ -71,25 +71,25 @@ public class MapTest {
     public void testInvalidMoveReturnsInvalid() {
         List<Direction> move = Arrays.asList(Direction.Up, Direction.Up, Direction.Up);
 
-        assertFalse(board.newLocationForMove(move, new Location(0, 0), Stream.<Location>empty()).isPresent());
+        assertFalse(board.newLocationForMove(move, new Location<>(0, 0), Stream.<Location<Integer>>empty()).isPresent());
     }
 
     @Test
     public void testValidMoveReturnsValid() {
         List<Direction> move = Arrays.asList(Direction.Right, Direction.Right, Direction.Up, Direction.Up, Direction.Left, Direction.Left);
-        Location startLocation = new Location(4, 17);
-        Location endLocation = new Location(4, 15);
+        Location<Integer> startLocation = new Location<>(4, 17);
+        Location<Integer> endLocation = new Location<>(4, 15);
 
-        assertEquals(board.newLocationForMove(move, startLocation, Stream.<Location>empty()).get(), endLocation);
+        assertEquals(board.newLocationForMove(move, startLocation, Stream.<Location<Integer>>empty()).get(), endLocation);
     }
 
     @Test
     public void testConnectedRoomsHaveNoWallBetweenThem() {
-        assertFalse(board.hasWallBetween(new Location(4, 6), new Location(4, 7)));
+        assertFalse(board.hasWallBetween(new Location<>(4, 6), new Location<>(4, 7)));
     }
 
     @Test
     public void testDisconnectedRoomsHaveWallsBetweenThem() {
-        assertTrue(board.hasWallBetween(new Location(3, 6), new Location(3, 7)));
+        assertTrue(board.hasWallBetween(new Location<>(3, 6), new Location<>(3, 7)));
     }
 }
