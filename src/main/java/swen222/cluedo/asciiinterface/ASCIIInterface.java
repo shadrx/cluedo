@@ -171,6 +171,11 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
+    public TurnOption requestPlayerChoiceForTurn(Player player) {
+        return TurnOption.values()[this.selectOptionFromList(Arrays.stream(TurnOption.values()).map(TurnOption::toString))];
+    }
+
+    @Override
     public List<Direction> requestPlayerMove(Player player, int distance) {
         this.out.printf("Enter a move of length %d.\n", distance);
         this.out.printf("Moves are in the format UDLR, where such a move would mean go up, then down, then left, then right.\n\n");

@@ -60,6 +60,8 @@ public interface CluedoInterface {
      */
     void showGame(Game game);
 
+    TurnOption requestPlayerChoiceForTurn(Player player);
+
     /**
      * Request a movement on the board that is exactly the given distance.
      *
