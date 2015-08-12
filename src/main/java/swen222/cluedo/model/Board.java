@@ -95,16 +95,15 @@ public class Board {
         Optional<Tile> t1 = this.safeTileAtLocation(l1);
         Optional<Tile> t2 = this.safeTileAtLocation(l2);
 
-        if (t1.isPresent() && t2.isPresent() && (!t1.get().adjacentLocations.isEmpty() || !t2.get().adjacentLocations.isEmpty())) {
+        if ((t1.isPresent() && !t1.get().adjacentLocations.isEmpty()) || (t2.isPresent() && !t2.get().adjacentLocations.isEmpty())) {
 
             boolean hasWall = false;
             if (t1.isPresent()) {
-                hasWall = !t1.get().adjacentLocations.containsValue(l2);
+                hasWall = !t1.get().adjacentLocations.containsValue(l2) || !t2.isPresent();
             } else if (t2.isPresent()) {
-                hasWall = !t2.get().adjacentLocations.containsValue(l1);
+                hasWall = true; //there's always a wall between border tiles and the outside.
             }
             return hasWall;
-
         }
 
         return false;

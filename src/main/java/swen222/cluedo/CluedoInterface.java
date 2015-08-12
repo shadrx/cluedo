@@ -6,6 +6,7 @@ import swen222.cluedo.model.card.Room;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CluedoInterface {
 
@@ -60,7 +61,14 @@ public interface CluedoInterface {
      */
     void showGame(Game game);
 
-    TurnOption requestPlayerChoiceForTurn(Player player);
+    /**
+     * Ask the player what action they want to take for their turn.
+     *
+     * @param possibleOptions The possible actions that the player can take at this time.
+     * @param player The player to ask
+     * @return The action that the player wants to perform.
+     */
+    TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleOptions, Player player);
 
     /**
      * Request a movement on the board that is exactly the given distance.

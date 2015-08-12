@@ -171,8 +171,11 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public TurnOption requestPlayerChoiceForTurn(Player player) {
-        return TurnOption.values()[this.selectOptionFromList(Arrays.stream(TurnOption.values()).map(TurnOption::toString))];
+    public TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleActions, Player player) {
+        Stream<TurnOption> sortedOptions = possibleActions.stream()
+                                            .sorted((option1, option2) -> option1.toString().compareTo(option2.toString()));
+        TurnOption[] sortedOptionsArray = (TurnOption[]) sortedOptions.toArray();
+        return sortedOptionsArray[this.selectOptionFromList(sortedOptions.map(TurnOption::toString))];
     }
 
     @Override

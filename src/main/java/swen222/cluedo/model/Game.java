@@ -3,9 +3,7 @@ package swen222.cluedo.model;
 import swen222.cluedo.model.card.Room;
 import swen222.cluedo.CluedoInterface;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Game {
@@ -92,6 +90,19 @@ public class Game {
         }
     }
 
+    private void performMoveForPlayer(Player player, List<Player> players) {
+        int diceRoll = (int) (Math.floor(Math.random() * 12) + 1);
+
+        Optional<Location<Integer>> newLocation = Optional.empty();
+        while (!newLocation.isPresent()) {
+            List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, diceRoll);
+            Stream<Location<Integer>> otherPlayerLocations = players.stream().filter(player1 -> player1 != player)
+                    .map(Player::location);
+            newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);
+        }
+        player.setLocation(newLocation.get());
+    }
+
     public void gameLoop(List<Player> players) {
 
         if (this.checkGameOver(players)) {
@@ -103,27 +114,36 @@ public class Game {
 
                 player.cluedoInterface.notifyStartOfTurn(player);
 
-                if (this.checkForAccusation(players, player)) {
-                    return;
-                }
+                EnumSet<TurnOption> possibleActions = EnumSet.of(TurnOption.EndTurn, TurnOption.Move);
 
                 player.cluedoInterface.showGame(this);
 
-                int diceRoll = (int)(Math.floor(Math.random() * 6) + 1);
+                while (!possibleActions.isEmpty()) {
 
-                Optional<Location<Integer>> newLocation = Optional.empty();
-                while (!newLocation.isPresent()) {
-                    List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, diceRoll);
-                    Stream<Location<Integer>> otherPlayerLocations = players.stream().filter(player1 -> player1 != player)
-                            .map(Player::location);
-                    newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);
-                }
-                player.setLocation(newLocation.get());
+                    Board.Tile tile = this.board.tileAtLocation(player.location());
 
-                Board.Tile tile = this.board.tileAtLocation(player.location());
+                    if (tile.room.isPresent()) {
+                        possibleActions.add(TurnOption.Suggestion);
+                    }
 
-                if (tile.room.isPresent()) {
-                    this.checkForSuggestion(player, tile.room.get());
+                    switch (player.cluedoInterface.requestPlayerChoiceForTurn(possibleActions, player)) {
+                        case Accusation:
+                            if (this.checkForAccusation(players, player)) {
+                                return;
+                            }
+                            break;
+                        case Suggestion:
+                            this.checkForSuggestion(player, tile.room.get());
+                            possibleActions.remove(TurnOption.Move);
+                            break;
+                        case EndTurn:
+                            possibleActions.clear();
+                            break;
+                        case Move:
+                            this.performMoveForPlayer(player, players);
+                            possibleActions.remove(TurnOption.Move);
+                            break;
+                    }
                 }
             }
         }
