@@ -11,8 +11,34 @@ import java.util.Set;
 
 public class CluedoGUIController implements CluedoInterface {
 
+    private final Object _syncObject = new Object();
+
+    private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
+
+    /**
+     * Tells the game thread that the response it was waiting for has been set, and that it may continue execution.
+     */
+    public void resumeGameThread() {
+        synchronized (_syncObject) {
+            _syncObject.notify();
+        }
+    }
+
+    private void waitForGUI() {
+        synchronized(_syncObject) {
+            try {
+                _syncObject.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     //GUI interaction methods. All of these should be executed on the main (i.e GUI) thread.
 
+    public void setPlayerOptionForTurn(TurnOption optionForTurn) {
+        _playerOptionForTurn = Optional.of(optionForTurn);
+    }
 
 
     //CluedoInterface response methods. All of these are executed on the game (i.e. second) thread.
@@ -54,7 +80,11 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleOptions, Player player) {
-        return null;
+
+        //gui.requestPlayerChoiceForTurn(possibleOptions, player);
+
+        waitForGUI();
+        return _playerOptionForTurn.get();
     }
 
     @Override

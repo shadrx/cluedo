@@ -1,7 +1,10 @@
 package swen222.cluedo.model;
 
+import swen222.cluedo.model.card.Card;
+import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import swen222.cluedo.CluedoInterface;
+import swen222.cluedo.model.card.Weapon;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -9,12 +12,22 @@ import java.util.stream.Stream;
 public class Game {
     public final Board board;
     public final Suggestion solution;
+    public final Set<Card> cardsNotInPlay;
     public final List<Player> allPlayers;
 
     public Game(Board board, Suggestion solution, List<Player> players) {
         this.board = board;
         this.solution = solution;
         this.allPlayers = players;
+
+        this.cardsNotInPlay = Card.allCards();
+        this.cardsNotInPlay.removeIf(
+                card -> players.stream()
+                        .map(player -> player.cards)
+                        .anyMatch(playerCards -> playerCards.contains(card)));
+        this.cardsNotInPlay.remove(this.solution.room);
+        this.cardsNotInPlay.remove(this.solution.weapon);
+        this.cardsNotInPlay.remove(this.solution.character);
     }
 
     /**

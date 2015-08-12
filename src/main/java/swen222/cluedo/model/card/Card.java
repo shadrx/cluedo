@@ -11,6 +11,14 @@ import java.util.Set;
  */
 public interface Card {
 
+    static Set<Card> allCards() {
+        Set<Card> cards = new HashSet<>();
+        cards.addAll(Arrays.asList(CluedoCharacter.values()));
+        cards.addAll(Arrays.asList(Room.values()));
+        cards.addAll(Arrays.asList(Weapon.values()));
+        return cards;
+    }
+
     static Set<Card>[] dealHands(int numHands, Suggestion solution) {
         Set<CluedoCharacter> availableCharacters = new HashSet<>(Arrays.asList(CluedoCharacter.values()));
         Set<Weapon> availableWeapons = new HashSet<>(Arrays.asList(Weapon.values()));
@@ -29,6 +37,8 @@ public interface Card {
 
         int i = 0;
 
+        int cardsPerHand = availableCards.size() / numHands;
+
         for (Card c : availableCards) {
             Set<Card> hand = hands[i % numHands];
             if (hand == null) {
@@ -38,6 +48,10 @@ public interface Card {
 
             hand.add(c);
             i++;
+
+            if (i >= cardsPerHand * numHands) {
+                return hands;
+            }
         }
 
         return hands;

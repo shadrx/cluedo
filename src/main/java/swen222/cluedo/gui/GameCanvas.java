@@ -6,6 +6,8 @@ import swen222.cluedo.model.card.Room;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Set;
+
 public class GameCanvas extends JPanel {
 
     private static final int WallWidth = 4;
@@ -48,6 +50,16 @@ public class GameCanvas extends JPanel {
 
 
         return new Location<>(startX + tileSize * location.x + tileCentreX, startY + tileSize * location.y + tileCentreY);
+    }
+
+    private void drawAccessibleTilesOverlay(Graphics g, Set<Location<Integer>[]> paths, int startX, int startY, int tileSize) {
+        for (Location<Integer>[] path : paths) {
+            Location<Integer> endTile = path[path.length - 1];
+
+            g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.length/11.f));
+
+            g.fillRect(startX + tileSize * endTile.x, startY + tileSize * endTile.y, tileSize, tileSize);
+        }
     }
 
     @SuppressWarnings("SuspiciousNameCombination") //so we don't get warned about using 'WallWidth' in conjunction with height
