@@ -26,6 +26,11 @@ public enum Room implements Card{
     }
 
     @Override
+    public String imageName() {
+        return super.toString() + ".png"; //the name as specified in the enum, plus .png
+    }
+
+    @Override
     public String toString() {
         switch (this) {
             case DiningRoom:

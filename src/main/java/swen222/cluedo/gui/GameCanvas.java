@@ -185,7 +185,6 @@ public class GameCanvas extends JPanel {
             g.setColor(player.character.colour());
             g.fillOval((int)(playerLocation.x - diameter/2 + characterEdgeInset), (int)(playerLocation.y - diameter/2 + characterEdgeInset), (int)diameter, (int)diameter);
         }
-
     }
 
     @Override

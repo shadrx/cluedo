@@ -19,15 +19,11 @@ public class CluedoGUIController implements CluedoInterface {
 
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
 
-    public static final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-
 
     private void runOnUIThread(Runnable runnable) {
         try {
             SwingUtilities.invokeAndWait(runnable);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (InterruptedException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }

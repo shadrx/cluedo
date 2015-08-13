@@ -2,6 +2,11 @@ package swen222.cluedo.model.card;
 
 import swen222.cluedo.model.Suggestion;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,5 +60,24 @@ public interface Card {
         }
 
         return hands;
+    }
+
+    static BufferedImage loadImage(String imageFileName){
+        URL url = Card.class.getResource(imageFileName);
+        if(url == null) return null;
+
+        try {
+            return ImageIO.read(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    String imageName();
+
+    default Image cardImage() {
+        String imageName = "resources/" + this.imageName();
+        return loadImage(imageName);
     }
 }

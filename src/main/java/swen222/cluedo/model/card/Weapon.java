@@ -17,4 +17,9 @@ public enum Weapon implements Card {
                 return super.toString();
         }
     }
+
+    @Override
+    public String imageName() {
+        return super.toString() + ".png"; //the name as specified in the enum, plus .png
+    }
 }
