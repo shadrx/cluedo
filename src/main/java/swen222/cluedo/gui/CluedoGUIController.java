@@ -5,15 +5,32 @@ import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class CluedoGUIController implements CluedoInterface {
 
     private final Object _syncObject = new Object();
 
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
+
+    public static final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+
+
+    private void runOnUIThread(Runnable runnable) {
+        try {
+            SwingUtilities.invokeAndWait(runnable);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Tells the game thread that the response it was waiting for has been set, and that it may continue execution.
@@ -80,7 +97,6 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleOptions, Player player) {
-
         //gui.requestPlayerChoiceForTurn(possibleOptions, player);
 
         waitForGUI();
