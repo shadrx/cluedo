@@ -7,7 +7,7 @@ import swen222.cluedo.model.Direction;
 import swen222.cluedo.model.Location;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,8 @@ public class MapTest {
     @Before
     public void loadBoard() {
         try {
-            this.board = new Board(Paths.get("resources/cluedo.map"), 24, 25);
+            InputStream boardStream = ClassLoader.getSystemClassLoader().getResourceAsStream("resources/cluedo.map");
+            this.board = new Board(boardStream, 24, 25);
         } catch (IOException ex) {
             System.err.println("Error reading map file: " + ex);
         }

@@ -20,6 +20,11 @@ public enum Weapon implements Card {
 
     @Override
     public String imageName() {
-        return super.toString() + ".png"; //the name as specified in the enum, plus .png
+        switch (this) {
+            case Spanner:
+                return "Wrench.png";
+            default:
+                return super.toString() + ".png"; //the name as specified in the enum, plus .png
+        }
     }
 }

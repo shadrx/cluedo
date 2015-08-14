@@ -1,14 +1,15 @@
 package swen222.cluedo.gui;
 
-import com.sun.xml.internal.ws.util.StreamUtils;
-import swen222.cluedo.model.card.Card;
+import swen222.cluedo.model.card.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class CardView extends JPanel implements MouseListener {
 
@@ -17,52 +18,62 @@ public class CardView extends JPanel implements MouseListener {
     }
 
     private static final int CardMargin = 20;
-    private static final int PreferredHeight = 400;
+    private static final int PreferredHeight = 220;
 
-    private Stream<Card> _cards;
-    private Stream<Image> _cardImages;
-    private Stream<Integer> _imageXs;
+    private List<Card> _cards;
+    private List<Image> _cardImages;
+    private Integer[] _imageXs;
 
-    private Optional<CardListener> _cardListener;
+    private Optional<CardListener> _cardListener = Optional.empty();
 
-    public CardView(Stream<Card> cards) {
+    public CardView(List<Card> cards) {
         this.setCards(cards);
 
         this.addMouseListener(this);
     }
 
-    public void setCards(Stream<Card> cards) {
+    public void setCards(List<Card> cards) {
         _cards = cards;
-        _cardImages = cards.map(Card::cardImage);
+        _cardImages = cards.stream().map(Card::cardImage).collect(Collectors.toList());
 
 
-        final int[] x = {0}; //This is a one-element array because apparently you need to do that to modify the variable in a lambda.
-                            //I know, it seems crazy to me too.
+        _imageXs = new Integer[_cardImages.size()];
+        int x = 0;
 
-        _imageXs = _cardImages.map((image) -> {
+        for (int i = 0; i < _cardImages.size(); i++) {
+            Image image = _cardImages.get(i);
+            _imageXs[i] = x;
+
             int imageWidth = image.getWidth(null) * PreferredHeight / image.getHeight(null);
-            int retVal = x[0];
-            x[0] += imageWidth * CardMargin;
-            return retVal;
-        });
+            x += imageWidth + CardMargin;
+        }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        Stream<swen222.cluedo.StreamUtils.Tuple<Image, Integer>> tuples = swen222.cluedo.StreamUtils.zip(_cardImages, _imageXs);
-        tuples.forEachOrdered((tuple) -> {
-            Image image = tuple.a;
+        for (int i = 0; i < _cardImages.size(); i++) {
+            Image image = _cardImages.get(i);
             int imageWidth = image.getWidth(null) * PreferredHeight / image.getHeight(null);
-            g.drawImage(image, tuple.b, 0, imageWidth, PreferredHeight, null);
-        });
+            g.drawImage(image, _imageXs[i], 0, imageWidth, PreferredHeight, null);
+        }
 
     }
 
     @Override
     public Dimension getPreferredSize() {
-        long width = CardMargin * (_cards.count() - 1);
-        width = _cardImages.reduce(width, (sum, image) -> sum + image.getWidth(null) * PreferredHeight / image.getHeight(null), Long::sum);
+        long width = CardMargin * (_cards.size() - 1);
+        width = _cardImages.stream().reduce(width, (sum, image) -> sum + image.getWidth(null) * PreferredHeight / image.getHeight(null), Long::sum);
         return new Dimension((int)width, PreferredHeight);
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return this.getPreferredSize();
+    }
+    
+    @Override
+    public Dimension getMaximumSize() {
+    	return this.getPreferredSize();
     }
 
     @Override

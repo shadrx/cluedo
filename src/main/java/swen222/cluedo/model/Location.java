@@ -52,7 +52,8 @@ public class Location<T extends Number> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Location location = (Location) o;
+        @SuppressWarnings("unchecked")
+		Location<T> location = (Location<T>) o;
 
         return x.equals(location.x) && y.equals(location.y);
     }

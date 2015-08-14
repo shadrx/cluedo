@@ -7,10 +7,12 @@ import swen222.cluedo.CluedoInterface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class Player {
 
+    public final Optional<String> name;
     public final CluedoCharacter character;
     /** Each player has their own referenced interface, so that, if desired, the output for each player can be sent to a different interface
      * without providing other players with information.
@@ -19,7 +21,16 @@ public class Player {
     public final Set<Card> cards;
     private Location<Integer> location;
 
+    public Player(String name, CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
+        this.name = Optional.of(name);
+        this.character = character;
+        this.location = character.startLocation();
+        this.cards = cards;
+        this.cluedoInterface = cluedoInterface;
+    }
+
     public Player(CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
+        this.name = Optional.empty();
         this.character = character;
         this.location = character.startLocation();
         this.cards = cards;
@@ -27,6 +38,7 @@ public class Player {
     }
 
     public Player(Player player) {
+        this.name = player.name;
         this.character = player.character;
         this.cards = player.cards;
         this.location = player.location.copy();

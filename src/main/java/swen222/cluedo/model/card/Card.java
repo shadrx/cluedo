@@ -63,7 +63,7 @@ public interface Card {
     }
 
     static BufferedImage loadImage(String imageFileName){
-        URL url = Card.class.getResource(imageFileName);
+        URL url = Card.class.getClassLoader().getResource(imageFileName);
         if(url == null) return null;
 
         try {
@@ -77,7 +77,7 @@ public interface Card {
     String imageName();
 
     default Image cardImage() {
-        String imageName = "resources/" + this.imageName();
+        String imageName = "images/" + this.imageName();
         return loadImage(imageName);
     }
 }

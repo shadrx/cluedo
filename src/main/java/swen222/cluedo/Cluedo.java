@@ -1,6 +1,8 @@
 package swen222.cluedo;
 
 import swen222.cluedo.gui.CluedoFrame;
+import swen222.cluedo.gui.MessageAndCardDialog;
+import swen222.cluedo.gui.PlayerSelectionDialog;
 import swen222.cluedo.model.Board;
 import swen222.cluedo.model.Game;
 import swen222.cluedo.model.Player;
@@ -8,8 +10,11 @@ import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.asciiinterface.ASCIIInterface;
+import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.card.Weapon;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +25,9 @@ class Cluedo {
 
     public static void main(String[] args) {
 
+        //new MessageAndCardDialog(null, "Title", "This is a longform message meant to span multiple lines.", Arrays.asList(CluedoCharacter.MissScarlet));
+        new PlayerSelectionDialog(null);
+
         //Get the number of players
         CluedoInterface cluedoInterface = new ASCIIInterface(System.in, System.out);
 
@@ -28,7 +36,8 @@ class Cluedo {
         //Load the board
         Board board;
         try {
-            board = new Board(Paths.get("resources/cluedo.map"), 24, 25);
+            InputStream boardStream = ClassLoader.getSystemClassLoader().getResourceAsStream("cluedo.map");
+            board = new Board(boardStream, 24, 25);
         } catch (IOException e) {
             e.printStackTrace();
             return;

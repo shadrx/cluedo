@@ -3,6 +3,7 @@ package swen222.cluedo.model;
 import swen222.cluedo.model.card.Room;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -15,11 +16,25 @@ public class Board {
     public final int width, height;
     private Map<Room, Location<Float>> _roomCentres = new HashMap<>();
 
-    public Board(Path mapPath, int width, int height) throws IOException {
-        List<String> lines = Files.readAllLines(mapPath);
+    public Board(InputStream boardStream, int width, int height) throws IOException {
+        List<String> lines = Board.linesFromStream(boardStream);
         this.tiles = loadMap(lines, width, height);
         this.width = width;
         this.height = height;
+    }
+
+    private static List<String> linesFromStream(InputStream is) {
+        Scanner s = new Scanner(is);
+        s.useDelimiter("\n");
+        List<String> lines = new ArrayList<>();
+
+        while (s.hasNext()) {
+            lines.add(s.next());
+        }
+
+        s.close();
+
+        return lines;
     }
 
     /**
