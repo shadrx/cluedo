@@ -20,14 +20,6 @@ public class CluedoGUIController implements CluedoInterface {
 
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
 
-    private void runOnUIThread(Runnable runnable) {
-        try {
-            SwingUtilities.invokeAndWait(runnable);
-        } catch (InterruptedException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Tells the game thread that the response it was waiting for has been set, and that it may continue execution.
      */
@@ -53,7 +45,6 @@ public class CluedoGUIController implements CluedoInterface {
         _playerOptionForTurn = Optional.of(optionForTurn);
     }
 
-
     //CluedoInterface response methods. All of these are executed on the game (i.e. second) thread.
 
     @Override
@@ -63,15 +54,19 @@ public class CluedoGUIController implements CluedoInterface {
             possibleValues[i] = min + i;
         }
 
-        Integer selectedValue = null;
+        final Integer[] selectedValue = new Integer[]{null};
 
-        while (selectedValue == null) {
-            selectedValue = (Integer) JOptionPane.showInputDialog(null,
-                    "Choose the number of players.", "How many players?",
-                    JOptionPane.PLAIN_MESSAGE, null,
-                    possibleValues, possibleValues[0]);
+        while (selectedValue[0] == null) {
+            SwingUtilities.invokeLater(() -> {
+                selectedValue[0] = (Integer) JOptionPane.showInputDialog(null,
+                        "Choose the number of players.", "How many players?",
+                        JOptionPane.PLAIN_MESSAGE, null,
+                        possibleValues, possibleValues[0]);
+                resumeGameThread();
+            });
+            waitForGUI();
         }
-        return selectedValue;
+        return selectedValue[0];
     }
 
     @Override
@@ -81,10 +76,10 @@ public class CluedoGUIController implements CluedoInterface {
         @SuppressWarnings("unchecked")
         final Pair<Optional<String>, CluedoCharacter>[] retVal = new Pair[]{null}; //One-element array to work around issues with variable modification in blocks.
 
-        new PlayerSelectionDialog((dialog, selectedName, selectedCharacter) -> {
+        SwingUtilities.invokeLater(() -> new PlayerSelectionDialog((dialog, selectedName, selectedCharacter) -> {
             retVal[0] = new Pair<>(Optional.of(selectedName), selectedCharacter);
             resumeGameThread();
-        }, availableCharactersSet);
+        }, availableCharactersSet));
 
         waitForGUI();
 
@@ -94,28 +89,37 @@ public class CluedoGUIController implements CluedoInterface {
     @Override
     public void notifyStartOfTurn(Player player) {
         if (_cluedoFrame == null) {
-            _cluedoFrame = new CluedoFrame();
+            SwingUtilities.invokeLater(() -> _cluedoFrame = new CluedoFrame());
         }
 
+        JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s's (%s) Turn", player.name, player.character));
+
+        //TODO setup the GUI to show player's cards, roll the dice.
 
     }
 
     @Override
     public void notifySuccess(Player player) {
-        JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made a correct accusation and has won!"), String.format("%s has Won!", player.name), JOptionPane.PLAIN_MESSAGE);
-        _cluedoFrame.dispose();
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made a correct accusation and has won!", player.name), String.format("%s has Won!", player.name), JOptionPane.PLAIN_MESSAGE);
+            _cluedoFrame.dispose();
+        });
     }
 
     @Override
     public void notifyFailure(Player player) {
-        JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing."), String.format("%s Made an Incorrect Accusation", player.name), JOptionPane.PLAIN_MESSAGE);
-        _cluedoFrame.dispose();
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing.", player.name), String.format("%s Made an Incorrect Accusation", player.name), JOptionPane.PLAIN_MESSAGE);
+            _cluedoFrame.dispose();
+        });
     }
 
     @Override
     public void notifyGameOver() {
-        JOptionPane.showMessageDialog(_cluedoFrame, "No one is left to play!", "Game Over", JOptionPane.PLAIN_MESSAGE);
-        _cluedoFrame.dispose();
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(_cluedoFrame, "No one is left to play!", "Game Over", JOptionPane.PLAIN_MESSAGE);
+            _cluedoFrame.dispose();
+        });
     }
 
     @Override
@@ -141,19 +145,43 @@ public class CluedoGUIController implements CluedoInterface {
         return null;
     }
 
+    private Optional<Suggestion> getPlayerSuggestion(Optional<Room> room) {
+        @SuppressWarnings("unchecked")
+        final Optional<Suggestion>[] retVal = new Optional[]{null};
+
+
+        SwingUtilities.invokeLater(() -> new PlayerSuggestionDialog(_cluedoFrame, new PlayerSuggestionDialog.PlayerSuggestionDelegate() {
+            @Override
+            public void playerDidMakeSuggestion(PlayerSuggestionDialog dialog, Suggestion suggestion) {
+                retVal[0] = Optional.of(suggestion);
+                resumeGameThread();
+            }
+
+            @Override
+            public void playerDidCancelSuggestion(PlayerSuggestionDialog dialog) {
+                retVal[0] = Optional.empty();
+                resumeGameThread();
+            }
+        },
+                room));
+
+        waitForGUI();
+
+        return retVal[0];
+    }
+
     @Override
     public Optional<Suggestion> requestPlayerAccusation(Player player) {
-        return null;
+        return this.getPlayerSuggestion(Optional.empty());
     }
 
     @Override
     public Optional<Suggestion> requestPlayerSuggestion(Player player, Room room) {
-        return null;
+        return this.getPlayerSuggestion(Optional.of(room));
     }
 
     @Override
     public SuggestionResponse requestPlayerResponse(Player player, List<SuggestionResponse> possibleResponses) {
-        JOptionPane.showMessageDialog(_cluedoFrame, String.format("For %s's eyes only:", player.name));
 
         String title = player.name.get();
         String message = "Click on a card to refute the suggestion.";
@@ -161,10 +189,17 @@ public class CluedoGUIController implements CluedoInterface {
 
         final SuggestionResponse[] response = {null};
 
-        new MessageAndCardDialog(_cluedoFrame, title, message, responseCards, (cardView, selectedCard) -> {
-            int responseIndex = responseCards.indexOf(selectedCard);
-            response[0] = possibleResponses.get(responseIndex);
-            resumeGameThread();
+
+        SwingUtilities.invokeLater(() -> {
+
+            JOptionPane.showMessageDialog(_cluedoFrame, String.format("For %s's eyes only:", player.name.get()));
+
+            new MessageAndCardDialog(_cluedoFrame, title, message, false, responseCards, (cardView, selectedCard) -> {
+                int responseIndex = responseCards.indexOf(selectedCard);
+                response[0] = possibleResponses.get(responseIndex);
+                long threadId = Thread.currentThread().getId();
+                resumeGameThread();
+            });
         });
 
         waitForGUI();
@@ -177,6 +212,6 @@ public class CluedoGUIController implements CluedoInterface {
         String title = player.name.get();
         String message = response.toString();
 
-        new MessageAndCardDialog(_cluedoFrame, title, message, Arrays.asList(response.card), null);
+        SwingUtilities.invokeLater(() -> new MessageAndCardDialog(_cluedoFrame, title, message, true, Collections.singletonList(response.card), null));
     }
 }

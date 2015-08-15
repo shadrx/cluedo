@@ -22,7 +22,7 @@ public class PlayerSelectionDialog extends JDialog {
 
     //Adapted from http://docs.oracle.com/javase/tutorial/uiswing/examples/layout/SpringDemo4Project/src/layout/SpringDemo4.java
 
-    private Optional<PlayerSelectionDelegate> _delegate = Optional.empty();
+    private final Optional<PlayerSelectionDelegate> _delegate;
     private String _playerName;
     private CluedoCharacter _selectedCharacter;
     private Player _player;

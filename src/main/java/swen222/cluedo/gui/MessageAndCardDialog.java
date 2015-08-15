@@ -12,10 +12,13 @@ public class MessageAndCardDialog extends JDialog {
     public final List<Card> cards;
 
     private static final int VerticalGap = 10;
-    public MessageAndCardDialog(Frame parent, String title, String message, List<Card> cards, CardView.CardListener cardListener) {
+    public MessageAndCardDialog(Frame parent, String title, String message, boolean showCloseButton, List<Card> cards, CardView.CardListener cardListener) {
         super(parent, title, true);
         this.message = message;
         this.cards = cards;
+
+        this.setDefaultCloseOperation(showCloseButton ? DISPOSE_ON_CLOSE : DO_NOTHING_ON_CLOSE);
+
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         getContentPane().add(Box.createVerticalStrut(VerticalGap));
@@ -37,26 +40,35 @@ public class MessageAndCardDialog extends JDialog {
 
         getContentPane().add(Box.createVerticalStrut(VerticalGap));
 
-        CardView cardView = new CardView(cards, Optional.ofNullable(cardListener));
+        CardView cardView = new CardView(cards, Optional.of((view, selectedCard) -> {
+            if (cardListener != null) {
+                cardListener.cardViewDidSelectCard(view, selectedCard);
+                this.dispose();
+            }
+        }));
         Dimension cardViewSize = cardView.getMaximumSize();
         cardView.setAlignmentX(Component.CENTER_ALIGNMENT);
-
 
         getContentPane().add(cardView);
 
         getContentPane().add(Box.createVerticalStrut(VerticalGap));
 
-        JButton closeButton = new JButton("Close");
-        closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        closeButton.addActionListener((actionEvent) -> {
-            this.dispose();
-        });
-        getContentPane().add(closeButton);
+        JButton closeButton = null;
+        if (showCloseButton) {
+            closeButton = new JButton("Close");
+            closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            closeButton.addActionListener((actionEvent) -> this.dispose());
+            getContentPane().add(closeButton);
+        }
 
         getContentPane().add(Box.createVerticalStrut(VerticalGap));
 
         //TODO This works, but it's by no means good.
-        this.setMinimumSize(new Dimension(cardViewSize.width + 30, cardViewSize.height + label.getPreferredSize().height + closeButton.getPreferredSize().height + 4 * VerticalGap + 50));
+        this.setMinimumSize(new Dimension(cardViewSize.width + 30,
+                cardViewSize.height +
+                        label.getPreferredSize().height +
+                        ((closeButton != null) ? closeButton.getPreferredSize().height : 0) +
+                        4 * VerticalGap + 50));
 
         this.setResizable(false);
         this.pack();
