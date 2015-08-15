@@ -1,12 +1,15 @@
 package swen222.cluedo.gui;
 
 import swen222.cluedo.model.*;
+import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 public class GameCanvas extends JPanel {
 
@@ -14,16 +17,57 @@ public class GameCanvas extends JPanel {
     private static final float PlayerDiameterRatio = 0.7f; //0.7 * the size of the tile.
     private static final Font GameFont = new Font("Verdana", Font.BOLD, 14);
 
-    private Game _gameState; //TODO
-    private Game _previousGameState = null; //TODO
+    private static final float TilesPerMillisecond = 6.f/1000.f;
+
+    private Game _previousGameState = null;
+    private Game _gameState = null;
+
+    private java.util.List<Location<Integer>> _lastPlayerMove = new ArrayList<>();
+    private CluedoCharacter _lastPlayerMoveCharacter = null;
+    private float _moveSequencePosition = -1.f;
 
     public GameCanvas() {
         super(true);
+
+        Timer runLoopTimer = new Timer(1000/60, (action) -> {
+            if (this.shouldPlayMoveSequence()) {
+                this.update(1000/60);
+                this.repaint();
+            }
+        });
+        runLoopTimer.setRepeats(true);
+        runLoopTimer.start();
     }
 
     public void setGameState(Game gameState) {
         _previousGameState = _gameState;
         _gameState = gameState;
+        this.repaint();
+    }
+
+    private boolean shouldPlayMoveSequence() {
+        return !_gameState.equals(_previousGameState) && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1;
+    }
+
+    public void setLastPlayerMove(List<Direction> move, Player player) {
+        _lastPlayerMove.clear();
+
+        Location<Integer> previousLocation = player.location();
+        _lastPlayerMove.add(previousLocation);
+
+        for (Direction direction : move) {
+            Location<Integer> nextLocation = previousLocation.locationInDirection(direction);
+            _lastPlayerMove.add(nextLocation);
+            previousLocation = nextLocation;
+        }
+
+        _lastPlayerMoveCharacter = player.character;
+        _moveSequencePosition = 0.f;
+    }
+
+    private void update(int deltaTime) {
+        float advanceMoveBy = deltaTime * TilesPerMillisecond;
+        _moveSequencePosition = Math.min(advanceMoveBy + _moveSequencePosition, _lastPlayerMove.size() - 1.f);
     }
 
     /**
@@ -50,6 +94,19 @@ public class GameCanvas extends JPanel {
 
 
         return new Location<>(startX + tileSize * location.x + tileCentreX, startY + tileSize * location.y + tileCentreY);
+    }
+
+    private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, int startX, int startY, int step) {
+        float diameter = step * PlayerDiameterRatio;
+
+        final float characterBorderRatio = 1.2f;
+        float characterEdgeInset = (step - diameter * characterBorderRatio)/4.f;
+
+        g.setColor(Color.black);
+        g.fillOval((int) (location.x - diameter * characterBorderRatio / 2 + characterEdgeInset), (int) (location.y - diameter * characterBorderRatio / 2 + characterEdgeInset), (int) (diameter * characterBorderRatio), (int)(diameter * characterBorderRatio));
+
+        g.setColor(character.colour());
+        g.fillOval((int)(location.x - diameter/2 + characterEdgeInset), (int)(location.y - diameter/2 + characterEdgeInset), (int)diameter, (int)diameter);
     }
 
     private void drawAccessibleTilesOverlay(Graphics g, Set<Location<Integer>[]> paths, int startX, int startY, int tileSize) {
@@ -141,7 +198,6 @@ public class GameCanvas extends JPanel {
                     g.fillRect(startX + step * x, startY + step * (y + 1) - 2, step, WallWidth);
                 }
 
-
                 y++;
             }
 
@@ -171,19 +227,23 @@ public class GameCanvas extends JPanel {
         }
 
         for (Player player : _gameState.allPlayers) {
+            Location<Float> playerLocation = null;
+            if (this.shouldPlayMoveSequence() && //We haven't finished animating the move
+                    player.character == _lastPlayerMoveCharacter) { //The move is for this character
 
-            Location<Float> playerLocation = this.centreForTileAtLocation(player.location(), board, startX, startY, step);
+                int lowIndex = (int)Math.floor(_moveSequencePosition);
+                int highIndex = (int)Math.ceil(_moveSequencePosition);
+                float lerpValue = _moveSequencePosition - lowIndex;
 
-            float diameter = step * PlayerDiameterRatio;
+                Location<Float> startLocation = this.centreForTileAtLocation(_lastPlayerMove.get(lowIndex), board, startX, startY, step);
+                Location<Float> endLocation = this.centreForTileAtLocation(_lastPlayerMove.get(highIndex), board, startX, startY, step);
+                playerLocation = Location.lerp(startLocation, endLocation, lerpValue);
 
-            final float characterBorderRatio = 1.2f;
-            float characterEdgeInset = (step - diameter * characterBorderRatio)/4.f;
+            } else {
+                playerLocation = this.centreForTileAtLocation(player.location(), board, startX, startY, step);
+            }
 
-            g.setColor(Color.black);
-            g.fillOval((int) (playerLocation.x - diameter * characterBorderRatio / 2 + characterEdgeInset), (int) (playerLocation.y - diameter * characterBorderRatio / 2 + characterEdgeInset), (int) (diameter * characterBorderRatio), (int)(diameter * characterBorderRatio));
-
-            g.setColor(player.character.colour());
-            g.fillOval((int)(playerLocation.x - diameter/2 + characterEdgeInset), (int)(playerLocation.y - diameter/2 + characterEdgeInset), (int)diameter, (int)diameter);
+            this.drawPlayer(g, playerLocation, player.character, startX, startY, step);
         }
     }
 

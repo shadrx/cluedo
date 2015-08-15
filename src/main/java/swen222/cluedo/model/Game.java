@@ -30,6 +30,20 @@ public class Game {
         this.cardsNotInPlay.remove(this.solution.character);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Game)) {
+            return false;
+        }
+        Game other = (Game)obj;
+
+        return super.equals(obj) &&
+                this.board.equals(other.board) &&
+                this.solution.equals(other.solution) &&
+                this.cardsNotInPlay.equals(other.cardsNotInPlay) &&
+                this.allPlayers.equals(other.allPlayers);
+    }
+
     /**
      * Returns allPlayers minus 'player', offset so that the player immediately after 'player' is at the start
      * of the returned list.

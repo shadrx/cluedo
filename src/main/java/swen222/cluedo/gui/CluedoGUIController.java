@@ -15,6 +15,8 @@ import java.util.Set;
 
 public class CluedoGUIController implements CluedoInterface {
 
+
+    private CluedoFrame _cluedoFrame = null;
     private final Object _syncObject = new Object();
 
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
@@ -67,7 +69,7 @@ public class CluedoGUIController implements CluedoInterface {
         while (selectedValue == null) {
             selectedValue = (Integer) JOptionPane.showInputDialog(null,
                     "Choose the number of players.", "How many players?",
-                    JOptionPane.INFORMATION_MESSAGE, null,
+                    JOptionPane.PLAIN_MESSAGE, null,
                     possibleValues, possibleValues[0]);
         }
         return selectedValue;
@@ -92,27 +94,34 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public void notifyStartOfTurn(Player player) {
+        if (_cluedoFrame == null) {
+            _cluedoFrame = new CluedoFrame();
+        }
+
 
     }
 
     @Override
     public void notifySuccess(Player player) {
-
+        JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made a correct accusation and has won!"), String.format("%s has Won!", player.name), JOptionPane.PLAIN_MESSAGE);
+        _cluedoFrame.dispose();
     }
 
     @Override
     public void notifyFailure(Player player) {
-
+        JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing."), String.format("%s Made an Incorrect Accusation", player.name), JOptionPane.PLAIN_MESSAGE);
+        _cluedoFrame.dispose();
     }
 
     @Override
     public void notifyGameOver() {
-
+        JOptionPane.showMessageDialog(_cluedoFrame, "No one is left to play!", "Game Over", JOptionPane.PLAIN_MESSAGE);
+        _cluedoFrame.dispose();
     }
 
     @Override
     public void showGame(Game game) {
-
+        _cluedoFrame.canvas.setGameState(game);
     }
 
     @Override
@@ -125,6 +134,11 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public List<Direction> requestPlayerMove(Player player, int distance) {
+
+        List<Direction> move = null; //...;
+
+        _cluedoFrame.canvas.setLastPlayerMove(move, player);
+
         return null;
     }
 

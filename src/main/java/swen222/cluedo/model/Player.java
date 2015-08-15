@@ -41,6 +41,21 @@ public class Player {
         this.cluedoInterface = player.cluedoInterface;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Player)) {
+            return false;
+        }
+        Player other = (Player)obj;
+
+        return super.equals(obj) &&
+                this.name.equals(other.name) &&
+                this.character == other.character &&
+                this.cluedoInterface == other.cluedoInterface &&
+                this.cards.equals(other.cards) &&
+                this.location.equals(other.location);
+    }
+
     public Player copy() {
         return new Player(this);
     }
