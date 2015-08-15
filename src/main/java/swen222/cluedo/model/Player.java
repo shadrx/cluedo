@@ -21,8 +21,8 @@ public class Player {
     public final Set<Card> cards;
     private Location<Integer> location;
 
-    public Player(String name, CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
-        this.name = Optional.of(name);
+    public Player(Optional<String> name, CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
+        this.name = name;
         this.character = character;
         this.location = character.startLocation();
         this.cards = cards;
@@ -30,11 +30,7 @@ public class Player {
     }
 
     public Player(CluedoCharacter character, Set<Card> cards, CluedoInterface cluedoInterface) {
-        this.name = Optional.empty();
-        this.character = character;
-        this.location = character.startLocation();
-        this.cards = cards;
-        this.cluedoInterface = cluedoInterface;
+        this(Optional.empty(), character, cards, cluedoInterface);
     }
 
     public Player(Player player) {

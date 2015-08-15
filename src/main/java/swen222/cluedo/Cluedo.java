@@ -1,7 +1,7 @@
 package swen222.cluedo;
 
 import swen222.cluedo.gui.CluedoFrame;
-import swen222.cluedo.gui.MessageAndCardDialog;
+import swen222.cluedo.gui.CluedoGUIController;
 import swen222.cluedo.gui.PlayerSelectionDialog;
 import swen222.cluedo.model.Board;
 import swen222.cluedo.model.Game;
@@ -10,26 +10,21 @@ import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.asciiinterface.ASCIIInterface;
-import swen222.cluedo.model.card.Room;
-import swen222.cluedo.model.card.Weapon;
+import utilities.Pair;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 class Cluedo {
 
+
+
     public static void main(String[] args) {
 
-        //new MessageAndCardDialog(null, "Title", "This is a longform message meant to span multiple lines.", Arrays.asList(CluedoCharacter.MissScarlet));
-        new PlayerSelectionDialog(null);
-
         //Get the number of players
-        CluedoInterface cluedoInterface = new ASCIIInterface(System.in, System.out);
+        CluedoInterface cluedoInterface = new CluedoGUIController();
 
         int numPlayers = cluedoInterface.getNumberOfPlayers(3, 6);
 
@@ -51,9 +46,9 @@ class Cluedo {
 
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
-            CluedoCharacter character = cluedoInterface.askToSelectACharacter(availableCharacters);
-            availableCharacters.remove(character);
-            Player player = new Player(character, hands[i], cluedoInterface);
+            Pair<Optional<String>, CluedoCharacter> nameAndCharacter = cluedoInterface.askForNameAndCharacter(availableCharacters);
+            availableCharacters.remove(nameAndCharacter.y);
+            Player player = new Player(nameAndCharacter.x, nameAndCharacter.y, hands[i], cluedoInterface);
             players.add(player);
         }
 

@@ -53,7 +53,7 @@ public enum CluedoCharacter implements Card {
 
     @Override
     public String imageName() {
-        return super.toString() + ".png"; //the name as specified in the enum, plus .png
+        return this.name() + ".png"; //the name as specified in the enum, plus .png
     }
 
     public Color colour() {

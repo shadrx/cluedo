@@ -3,6 +3,7 @@ package swen222.cluedo;
 import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
+import utilities.Pair;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public interface CluedoInterface {
      * @param availableCharacters list of characters available to choose from
      * @return the character the player chose
      * */
-    CluedoCharacter askToSelectACharacter(List<CluedoCharacter> availableCharacters);
+    Pair<Optional<String>, CluedoCharacter> askForNameAndCharacter(List<CluedoCharacter> availableCharacters);
 
     /**
      * Notify that player is about to start their turn.

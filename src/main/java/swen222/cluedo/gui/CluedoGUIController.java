@@ -4,21 +4,20 @@ import swen222.cluedo.CluedoInterface;
 import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
+import utilities.Pair;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class CluedoGUIController implements CluedoInterface {
 
     private final Object _syncObject = new Object();
 
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
-
 
     private void runOnUIThread(Runnable runnable) {
         try {
@@ -58,12 +57,37 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public int getNumberOfPlayers(int min, int max) {
-        return 0;
+        Integer[] possibleValues = new Integer[max - min + 1];
+        for (int i = 0; i < max - min + 1; i++) {
+            possibleValues[i] = min + i;
+        }
+
+        Integer selectedValue = null;
+
+        while (selectedValue == null) {
+            selectedValue = (Integer) JOptionPane.showInputDialog(null,
+                    "Choose the number of players.", "How many players?",
+                    JOptionPane.INFORMATION_MESSAGE, null,
+                    possibleValues, possibleValues[0]);
+        }
+        return selectedValue;
     }
 
     @Override
-    public CluedoCharacter askToSelectACharacter(List<CluedoCharacter> availableCharacters) {
-        return null;
+    public Pair<Optional<String>, CluedoCharacter> askForNameAndCharacter(List<CluedoCharacter> availableCharacters) {
+        Set<CluedoCharacter> availableCharactersSet = new HashSet<>(availableCharacters);
+
+        @SuppressWarnings("unchecked")
+        final Pair<Optional<String>, CluedoCharacter>[] retVal = new Pair[]{null}; //One-element array to work around issues with variable modification in blocks.
+
+        new PlayerSelectionDialog((dialog, selectedName, selectedCharacter) -> {
+            retVal[0] = new Pair<>(Optional.of(selectedName), selectedCharacter);
+            resumeGameThread();
+        }, availableCharactersSet);
+
+        waitForGUI();
+
+        return retVal[0];
     }
 
     @Override

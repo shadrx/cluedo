@@ -5,6 +5,7 @@ import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import swen222.cluedo.model.card.Weapon;
+import utilities.Pair;
 
 import javax.swing.text.html.Option;
 import java.io.InputStream;
@@ -82,13 +83,13 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public CluedoCharacter askToSelectACharacter(List<CluedoCharacter> availableCharacters) {
+    public Pair<Optional<String>, CluedoCharacter> askForNameAndCharacter(List<CluedoCharacter> availableCharacters) {
         Stream<String> characterNames = availableCharacters.stream().map(CluedoCharacter::toString);
 
         this.out.println("Select a character:\n");
 
         int index = this.selectOptionFromList(characterNames);
-        return availableCharacters.get(index);
+        return new Pair<>(Optional.empty(), availableCharacters.get(index));
     }
 
     @Override

@@ -1,82 +1,111 @@
 package swen222.cluedo.gui;
 
 import swen222.cluedo.model.Player;
+import swen222.cluedo.model.card.Card;
+import swen222.cluedo.model.card.CluedoCharacter;
+import utilities.SpringUtilities;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Optional;
+import java.util.Set;
 
 public class PlayerSelectionDialog extends JDialog {
 
     public interface PlayerSelectionDelegate {
-        Player playerSelectionDelegateDidCreatePlayer(PlayerSelectionDialog dialog);
+        void playerSelectionDialogDidCreatePlayer(PlayerSelectionDialog dialog, String name, CluedoCharacter character);
     }
 
     //Adapted from http://docs.oracle.com/javase/tutorial/uiswing/examples/layout/SpringDemo4Project/src/layout/SpringDemo4.java
 
-    private PlayerSelectionDelegate _delegate;
+    private Optional<PlayerSelectionDelegate> _delegate = Optional.empty();
+    private String _playerName;
+    private CluedoCharacter _selectedCharacter;
+    private Player _player;
 
-    public PlayerSelectionDialog(PlayerSelectionDelegate delegate) {
-        _delegate = delegate;
+    public PlayerSelectionDialog(PlayerSelectionDelegate delegate, Set<CluedoCharacter> availableCharacters) {
+        super((JFrame)null, "Create a New Player");
+        _delegate = Optional.ofNullable(delegate);
 
-        SpringLayout layout = new SpringLayout();
-        getContentPane().setLayout(layout);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-        //Create and add the components.
-        JLabel label = new JLabel("Name: ");
-        JTextField textField = new JTextField("Enter your name.", 15);
-        getContentPane().add(label);
-        getContentPane().add(textField);
+        Container contentPane = this.getContentPane();
+        contentPane.setLayout(new BorderLayout());
 
-        //Adjust constraints for the label so it's at (5,5).
-        SpringLayout.Constraints  labelCons =
-                layout.getConstraints(label);
-        labelCons.setX(Spring.constant(5));
-        labelCons.setY(Spring.constant(5));
 
-        //Adjust constraints for the text field so it's at
-        //(<label's right edge> + 5, 5).
-        SpringLayout.Constraints textFieldCons =
-                layout.getConstraints(textField);
-        textFieldCons.setX(Spring.sum(Spring.constant(5),
-                labelCons.getConstraint(SpringLayout.EAST)));
-        textFieldCons.setY(Spring.constant(5));
+        JPanel dataEntryPanel = new JPanel(new SpringLayout());
 
-        //Adjust constraints for the content pane.
-        setContainerSize(getContentPane(), 5);
+        JLabel nameLabel = new JLabel("Name:", JLabel.TRAILING);
+        dataEntryPanel.add(nameLabel);
+        JTextField nameField = new JTextField(10);
+        nameField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                _playerName = nameField.getText();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                _playerName = nameField.getText();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                _playerName = nameField.getText();
+            }
+        });
+        nameLabel.setLabelFor(nameField);
+        dataEntryPanel.add(nameField);
+
+        dataEntryPanel.add(new JLabel("Choose a character:", JLabel.TRAILING));
+
+        CluedoCharacter[] allCharacters = CluedoCharacter.values();
+
+        ButtonGroup buttonGroup = new ButtonGroup();
+
+        for (int i = 0; i < allCharacters.length; i++) {
+            CluedoCharacter character = allCharacters[i];
+            JRadioButton button = new JRadioButton(character.toString());
+
+            button.addActionListener((action) -> _selectedCharacter = character);
+
+            button.setEnabled(availableCharacters.contains(character));
+            buttonGroup.add(button);
+
+            dataEntryPanel.add(button);
+
+            if (i + 1 != allCharacters.length) {
+                dataEntryPanel.add(Box.createHorizontalBox());
+            }
+        }
+
+        //Lay out the panel.
+        SpringUtilities.makeCompactGrid(dataEntryPanel,
+                allCharacters.length + 1, 2, //rows, cols
+                6, 6,        //initX, initY
+                6, 6);       //xPad, yPad
+
+        this.add(dataEntryPanel, BorderLayout.CENTER);
+
+        JButton closeButton = new JButton("OK");
+        closeButton.addActionListener((action) -> {
+            if (_selectedCharacter != null && _playerName != null && _playerName.length() > 0) {
+                if (_delegate.isPresent()) {
+                    _delegate.get().playerSelectionDialogDidCreatePlayer(PlayerSelectionDialog.this, _playerName, _selectedCharacter);
+                }
+                this.dispose();
+            }
+        });
+
+        this.add(closeButton, BorderLayout.SOUTH);
 
         //Display the window.
         this.pack();
+        this.setLocationRelativeTo(null); //center on the screen.
         this.setVisible(true);
-    }
-
-
-    public static void setContainerSize(Container parent, int pad) {
-        SpringLayout layout = (SpringLayout) parent.getLayout();
-        Component[] components = parent.getComponents();
-        Spring maxHeightSpring = Spring.constant(0);
-        SpringLayout.Constraints pCons = layout.getConstraints(parent);
-
-        //Set the container's right edge to the right edge
-        //of its rightmost component + padding.
-        Component rightmost = components[components.length - 1];
-        SpringLayout.Constraints rCons =
-                layout.getConstraints(rightmost);
-        pCons.setConstraint(
-                SpringLayout.EAST,
-                Spring.sum(Spring.constant(pad),
-                        rCons.getConstraint(SpringLayout.EAST)));
-
-        //Set the container's bottom edge to the bottom edge
-        //of its tallest component + padding.
-        for (int i = 0; i < components.length; i++) {
-            SpringLayout.Constraints cons =
-                    layout.getConstraints(components[i]);
-            maxHeightSpring = Spring.max(maxHeightSpring,
-                    cons.getConstraint(
-                            SpringLayout.SOUTH));
-        }
-        pCons.setConstraint(
-                SpringLayout.SOUTH,
-                Spring.sum(Spring.constant(pad), maxHeightSpring));
     }
 }
