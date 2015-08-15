@@ -2,16 +2,15 @@ package swen222.cluedo.gui;
 
 import swen222.cluedo.CluedoInterface;
 import swen222.cluedo.model.*;
+import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import utilities.Pair;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CluedoGUIController implements CluedoInterface {
 
@@ -154,11 +153,30 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public SuggestionResponse requestPlayerResponse(Player player, List<SuggestionResponse> possibleResponses) {
-        return null;
+        JOptionPane.showMessageDialog(_cluedoFrame, String.format("For %s's eyes only:", player.name));
+
+        String title = player.name.get();
+        String message = "Click on a card to refute the suggestion.";
+        List<Card> responseCards = possibleResponses.stream().map((suggestionResponse -> suggestionResponse.card)).collect(Collectors.toList());
+
+        final SuggestionResponse[] response = {null};
+
+        new MessageAndCardDialog(_cluedoFrame, title, message, responseCards, (cardView, selectedCard) -> {
+            int responseIndex = responseCards.indexOf(selectedCard);
+            response[0] = possibleResponses.get(responseIndex);
+            resumeGameThread();
+        });
+
+        waitForGUI();
+
+        return response[0];
     }
 
     @Override
     public void notifyPlayerResponse(Player player, SuggestionResponse response) {
+        String title = player.name.get();
+        String message = response.toString();
 
+        new MessageAndCardDialog(_cluedoFrame, title, message, Arrays.asList(response.card), null);
     }
 }

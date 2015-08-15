@@ -5,13 +5,14 @@ import swen222.cluedo.model.card.Card;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Optional;
 
 public class MessageAndCardDialog extends JDialog {
     public final String message;
     public final List<Card> cards;
 
     private static final int VerticalGap = 10;
-    public MessageAndCardDialog(Frame parent, String title, String message, List<Card> cards) {
+    public MessageAndCardDialog(Frame parent, String title, String message, List<Card> cards, CardView.CardListener cardListener) {
         super(parent, title, true);
         this.message = message;
         this.cards = cards;
@@ -36,10 +37,11 @@ public class MessageAndCardDialog extends JDialog {
 
         getContentPane().add(Box.createVerticalStrut(VerticalGap));
 
-        CardView cardView = new CardView(cards);
+        CardView cardView = new CardView(cards, Optional.ofNullable(cardListener));
         Dimension cardViewSize = cardView.getMaximumSize();
         cardView.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
+
         getContentPane().add(cardView);
 
         getContentPane().add(Box.createVerticalStrut(VerticalGap));

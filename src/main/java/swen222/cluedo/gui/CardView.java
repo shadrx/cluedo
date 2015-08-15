@@ -26,8 +26,10 @@ public class CardView extends JPanel implements MouseListener {
 
     private Optional<CardListener> _cardListener = Optional.empty();
 
-    public CardView(List<Card> cards) {
+    public CardView(List<Card> cards, Optional<CardListener> cardListener) {
         this.setCards(cards);
+
+        _cardListener = cardListener;
 
         this.addMouseListener(this);
     }
@@ -78,6 +80,22 @@ public class CardView extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (!_cardListener.isPresent()) {
+            return;
+        }
+
+        int x = e.getX();
+
+        for (int i = 0; ; i++) {
+            Image image = _cardImages.get(i);
+            int imageWidth = image.getWidth(null) * PreferredHeight / image.getHeight(null);
+
+            int cardX = _imageXs[i];
+            if (x >= cardX && x <= cardX + imageWidth) {
+                _cardListener.get().cardViewDidSelectCard(this, _cards.get(i));
+                return;
+            }
+        }
 
     }
 
