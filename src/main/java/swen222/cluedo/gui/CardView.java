@@ -18,7 +18,7 @@ public class CardView extends JPanel implements MouseListener {
     }
 
     private static final int CardMargin = 20;
-    private static final int PreferredHeight = 220;
+    private static final int PreferredHeight = 150;
 
     private List<Card> _cards;
     private List<Image> _cardImages;
