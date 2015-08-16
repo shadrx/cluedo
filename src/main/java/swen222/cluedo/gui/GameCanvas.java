@@ -46,7 +46,7 @@ public class GameCanvas extends JPanel {
     }
 
     private boolean shouldPlayMoveSequence() {
-        return !_gameState.equals(_previousGameState) && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1;
+        return _gameState != null && !_gameState.equals(_previousGameState) && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1;
     }
 
     public void setLastPlayerMove(List<Direction> move, Player player) {
