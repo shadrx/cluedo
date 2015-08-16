@@ -21,8 +21,8 @@ public class DiceView extends JPanel {
 
     private int _remainingValue;
 
-    public DiceView() {
-        setDiceValue(7);
+    public DiceView(int diceValue) {
+        this.setDiceValue(diceValue);
     }
 
     /**
@@ -125,75 +125,32 @@ public class DiceView extends JPanel {
     }
 
     @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(80, 100);
+    }
+
+    @Override
     public Dimension getPreferredSize() {
         return new Dimension(200, 100);
     }
 
-    // this is horrible. there will be a better way.
+
     private static final Map<Integer, List<Pair<Integer, Integer>>> splitDiceValueMap;
     static {
         Map<Integer, List<Pair<Integer, Integer>>> splitDiceValueMapModifiable = new HashMap<>();
 
-        List<Pair<Integer, Integer>> two = new ArrayList<>();
-        two.add(new Pair<>(1, 1));
-        List<Pair<Integer, Integer>> three = new ArrayList<>();
-        three.add(new Pair<>(1, 2));
-        three.add(new Pair<>(2, 1));
-        List<Pair<Integer, Integer>> four = new ArrayList<>();
-        four.add(new Pair<>(3, 1));
-        four.add(new Pair<>(1, 3));
-        four.add(new Pair<>(2, 2));
-        List<Pair<Integer, Integer>> five = new ArrayList<>();
-        five.add(new Pair<>(1, 4));
-        five.add(new Pair<>(4, 1));
-        five.add(new Pair<>(3, 2));
-        five.add(new Pair<>(2, 3));
-        List<Pair<Integer, Integer>> six = new ArrayList<>();
-        six.add(new Pair<>(1, 5));
-        six.add(new Pair<>(5, 1));
-        six.add(new Pair<>(4, 2));
-        six.add(new Pair<>(2, 4));
-        six.add(new Pair<>(3, 3));
-        List<Pair<Integer, Integer>> seven = new ArrayList<>();
-        seven.add(new Pair<>(1, 6));
-        seven.add(new Pair<>(6, 1));
-        seven.add(new Pair<>(5, 2));
-        seven.add(new Pair<>(2, 5));
-        seven.add(new Pair<>(3, 4));
-        seven.add(new Pair<>(4, 3));
-        List<Pair<Integer, Integer>> eight = new ArrayList<>();
-        eight.add(new Pair<>(2, 6));
-        eight.add(new Pair<>(6, 2));
-        eight.add(new Pair<>(5, 3));
-        eight.add(new Pair<>(3, 5));
-        eight.add(new Pair<>(4, 4));
-        List<Pair<Integer, Integer>> nine = new ArrayList<>();
-        nine.add(new Pair<>(3, 6));
-        nine.add(new Pair<>(6, 3));
-        nine.add(new Pair<>(5, 4));
-        nine.add(new Pair<>(4, 5));
-        List<Pair<Integer, Integer>> ten = new ArrayList<>();
-        ten.add(new Pair<>(4, 6));
-        ten.add(new Pair<>(6, 4));
-        ten.add(new Pair<>(5, 5));
-        List<Pair<Integer, Integer>> eleven = new ArrayList<>();
-        eleven.add(new Pair<>(5, 6));
-        eleven.add(new Pair<>(6, 5));
-        List<Pair<Integer, Integer>> twelve = new ArrayList<>();
-        twelve.add(new Pair<>(6, 6));
+        for (int i = 1; i <= 6; i++) {
+            for (int j = 1; j <= 6; j++) {
+                int sum = i + j;
+                List<Pair<Integer, Integer>> numbersForSum = splitDiceValueMapModifiable.get(sum);
+                if (numbersForSum == null) {
+                    numbersForSum = new ArrayList<>();
+                    splitDiceValueMapModifiable.put(sum, numbersForSum);
+                }
 
-        splitDiceValueMapModifiable.put(2, two);
-        splitDiceValueMapModifiable.put(3, three);
-        splitDiceValueMapModifiable.put(4, four);
-        splitDiceValueMapModifiable.put(5, five);
-        splitDiceValueMapModifiable.put(6, six);
-        splitDiceValueMapModifiable.put(7, seven);
-        splitDiceValueMapModifiable.put(8, eight);
-        splitDiceValueMapModifiable.put(9, nine);
-        splitDiceValueMapModifiable.put(10, ten);
-        splitDiceValueMapModifiable.put(11, eleven);
-        splitDiceValueMapModifiable.put(12, twelve);
-
+                numbersForSum.add(new Pair<>(i, j));
+            }
+        }
         splitDiceValueMap = Collections.unmodifiableMap(splitDiceValueMapModifiable);
     }
 }

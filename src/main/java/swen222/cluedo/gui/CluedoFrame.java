@@ -26,7 +26,7 @@ public class CluedoFrame extends JFrame {
 
     public CluedoFrame() {
         super("Cluedo");
-        createAndShowGUI();
+        this.createAndShowGUI();
     }
 
     private void createAndShowGUI() {
@@ -39,7 +39,7 @@ public class CluedoFrame extends JFrame {
 
         // add card view
         this.cardView = new CardView(Arrays.asList(new Card[]{CluedoCharacter.MrsWhite, Weapon.Rope, Room.Ballroom, CluedoCharacter.ColonelMustard, Weapon.Candlestick}), Optional.empty());
-        this.diceView = new DiceView();
+        this.diceView = new DiceView(7);
 
         // setup the bottom panel
         this.bottomPanel = new JPanel();
@@ -47,7 +47,12 @@ public class CluedoFrame extends JFrame {
         this.bottomPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         this.bottomPanel.add(diceView, BorderLayout.WEST);
         this.bottomPanel.add(Box.createHorizontalStrut(10));
-        this.bottomPanel.add(cardView, BorderLayout.CENTER);
+
+        JScrollPane cardScrollPane = new JScrollPane(cardView, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        cardScrollPane.setOpaque(false);
+        cardScrollPane.setMaximumSize(cardView.getMaximumSize());
+
+        this.bottomPanel.add(cardScrollPane, BorderLayout.CENTER);
         this.bottomPanel.add(Box.createHorizontalStrut(10));
         this.bottomPanel.add(actionView, BorderLayout.EAST);
 

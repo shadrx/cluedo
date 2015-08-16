@@ -22,8 +22,8 @@ public class CluedoActionView extends JComponent {
         void didMakeAccusation();
     }
 
-    private final JButton _makeSuggestion = new JButton("Make Suggestion");
-    private final JButton _makeAccusation = new JButton("Make Accusation");
+    private final JButton _makeSuggestion = new JButton("Make a Suggestion");
+    private final JButton _makeAccusation = new JButton("Make an Accusation");
 
     private Optional<CluedoActionListener> _cluedoActionListener = Optional.empty();
 

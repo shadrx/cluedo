@@ -7,12 +7,18 @@ import swen222.cluedo.model.card.Room;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
 
 public class GameCanvas extends JPanel {
+
+    public interface TileSelectionDelegate {
+        void didSelectTileAtLocation(Location<Integer> location);
+    }
 
     private static final int WallWidth = 4;
     private static final double PlayerDiameterRatio = 0.7f; //0.7 * the size of the tile.
@@ -22,6 +28,8 @@ public class GameCanvas extends JPanel {
 
     private Game _previousGameState = null;
     private Game _gameState = null;
+
+    private Optional<TileSelectionDelegate> _tileSelectionDelegate;
 
     private java.util.List<Location<Integer>> _lastPlayerMove = new ArrayList<>();
     private CluedoCharacter _lastPlayerMoveCharacter = null;
@@ -38,6 +46,45 @@ public class GameCanvas extends JPanel {
         });
         runLoopTimer.setRepeats(true);
         runLoopTimer.start();
+
+
+        this.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                double width = GameCanvas.this.getWidth();
+                double height = GameCanvas.this.getHeight();
+                Board board = _gameState.board;
+                double ratio = (double)board.width / board.height;
+                width = Math.min(width, (height * ratio));
+                height = Math.min(height, (width / ratio));
+                double startX = GameCanvas.this.getWidth()/2 - width/2;
+                double startY = GameCanvas.this.getHeight()/2 - height/2;
+                double step = width / board.width;
+
+                int tileX = (int)((e.getX() - startX)/step);
+                int tileY = (int)((e.getY() - startY)/step);
+                if (_tileSelectionDelegate.isPresent() && tileX >= 0 && tileX < board.width && tileY >= 0 && tileY < board.height) {
+                    _tileSelectionDelegate.get().didSelectTileAtLocation(new Location<>(tileX, tileY));
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
+
     }
 
     public void setGameState(Game gameState) {
