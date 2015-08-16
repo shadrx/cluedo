@@ -24,12 +24,6 @@ class Cluedo {
         //Get the number of players
         CluedoInterface cluedoInterface = new CluedoGUIController();
 
-        new Thread(() -> {
-            List<SuggestionResponse> possibleResponses = Arrays.asList(new SuggestionResponse(SuggestionResponse.Type.DisproveCharacter, CluedoCharacter.MissScarlet),
-                    new SuggestionResponse(SuggestionResponse.Type.DisproveRoom, Room.Conservatory));
-            SuggestionResponse selectedResponse = cluedoInterface.requestPlayerResponse(new Player(Optional.of("Thomas"), CluedoCharacter.ColonelMustard, null, cluedoInterface), possibleResponses);
-            System.out.println(selectedResponse);
-
             int numPlayers = cluedoInterface.getNumberOfPlayers(3, 6);
 
             //Load the board
@@ -63,6 +57,5 @@ class Cluedo {
             frame.canvas.setGameState(game);
 
             //  game.gameLoop(game.allPlayers);
-        }).run();
     }
 }

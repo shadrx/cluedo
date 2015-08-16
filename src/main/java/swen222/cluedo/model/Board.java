@@ -143,12 +143,14 @@ public class Board {
         return path;
     }
 
-    public Set<Location<Integer>[]> pathsFromLocation(Location<Integer> location, int maxDistance, Stream<Location<Integer>> blockedLocations) {
+    public Set<Location<Integer>[]> pathsFromLocation(Location<Integer> location, int maxDistance, Set<Location<Integer>> blockedLocations) {
         Set<Location<Integer>[]> paths = new HashSet<>();
 
         DijkstraNode[][] nodeData = new DijkstraNode[this.width][this.height];
         for (DijkstraNode[] column : nodeData) {
-            Arrays.fill(column, new DijkstraNode());
+            for (int i = 0; i < column.length; i++) {
+                column[i] = new DijkstraNode();
+            }
         }
 
         nodeData[location.x][location.y].distanceFromSource = 0;
@@ -157,16 +159,18 @@ public class Board {
                 (l1, l2) -> nodeData[l1.x][l1.y].distanceFromSource - nodeData[l2.x][l2.y].distanceFromSource
         );
 
-        for (int x = 0; x < this.width; x++) {
-            for (int y = 0; y < this.height; y++) {
-                queue.add(new Location<>(x, y));
-            }
-        }
+        queue.add(location);
+
+//        for (int x = 0; x < this.width; x++) {
+//            for (int y = 0; y < this.height; y++) {
+//                queue.add(new Location<>(x, y));
+//            }
+//        }
 
         while (!queue.isEmpty()) {
             Location<Integer> currentLocation = queue.poll();
             for (Location<Integer> neighbour : this.tileAtLocation(currentLocation).adjacentLocations.values()) {
-                if (blockedLocations.anyMatch(location1 -> location1.equals(neighbour))) {
+                if (blockedLocations.contains(neighbour)) {
                     continue;
                 }
 
@@ -181,6 +185,8 @@ public class Board {
                     nodeData[neighbour.x][neighbour.y].previousLocation = Optional.of(currentLocation);
 
                     paths.add(this.reconstructPath(neighbour, nodeData, distance));
+
+                    queue.add(neighbour); //add the neighbour to the queue,
                 }
 
             }

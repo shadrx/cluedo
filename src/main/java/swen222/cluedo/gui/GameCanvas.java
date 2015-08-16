@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class GameCanvas extends JPanel {
 
@@ -46,7 +47,7 @@ public class GameCanvas extends JPanel {
     }
 
     private boolean shouldPlayMoveSequence() {
-        return _gameState != null && !_gameState.equals(_previousGameState) && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1;
+        return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1 && !_gameState.equals(_previousGameState);
     }
 
     public void setLastPlayerMove(List<Direction> move, Player player) {
