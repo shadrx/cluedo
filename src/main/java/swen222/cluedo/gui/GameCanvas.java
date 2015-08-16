@@ -15,17 +15,17 @@ import java.util.stream.Stream;
 public class GameCanvas extends JPanel {
 
     private static final int WallWidth = 4;
-    private static final float PlayerDiameterRatio = 0.7f; //0.7 * the size of the tile.
+    private static final double PlayerDiameterRatio = 0.7f; //0.7 * the size of the tile.
     private static final Font GameFont = new Font("Verdana", Font.BOLD, 14);
 
-    private static final float TilesPerMillisecond = 6.f/1000.f;
+    private static final double TilesPerMillisecond = 6.f/1000.f;
 
     private Game _previousGameState = null;
     private Game _gameState = null;
 
     private java.util.List<Location<Integer>> _lastPlayerMove = new ArrayList<>();
     private CluedoCharacter _lastPlayerMoveCharacter = null;
-    private float _moveSequencePosition = -1.f;
+    private double _moveSequencePosition = -1.f;
 
     public GameCanvas() {
         super(true);
@@ -67,16 +67,20 @@ public class GameCanvas extends JPanel {
     }
 
     private void update(int deltaTime) {
-        float advanceMoveBy = deltaTime * TilesPerMillisecond;
+        double advanceMoveBy = deltaTime * TilesPerMillisecond;
         _moveSequencePosition = Math.min(advanceMoveBy + _moveSequencePosition, _lastPlayerMove.size() - 1.f);
+    }
+
+    private int round(double f) {
+        return (int)Math.round(f);
     }
 
     /**
      * Returns the location, in pixels, of the centre of a tile at a given location, taking the walls into account.
      */
-    private Location<Float> centreForTileAtLocation(Location<Integer> location, Board board, int startX, int startY, int tileSize) {
-        float tileCentreX = tileSize/2.f;
-        float tileCentreY = tileSize/2.f;
+    private Location<Float> centreForTileAtLocation(Location<Integer> location, Board board, double startX, double startY, double tileSize) {
+        double tileCentreX = tileSize/2.f;
+        double tileCentreY = tileSize/2.f;
 
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Up))) {
             tileCentreY += WallWidth/2.f;
@@ -94,20 +98,20 @@ public class GameCanvas extends JPanel {
         }
 
 
-        return new Location<>(startX + tileSize * location.x + tileCentreX, startY + tileSize * location.y + tileCentreY);
+        return new Location<>((float)(startX + tileSize * location.x + tileCentreX),(float)(startY + tileSize * location.y + tileCentreY));
     }
 
-    private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, int startX, int startY, int step) {
-        float diameter = step * PlayerDiameterRatio;
+    private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, double startX, double startY, double step) {
+        double diameter = step * PlayerDiameterRatio;
 
-        final float characterBorderRatio = 1.2f;
-        float characterEdgeInset = (step - diameter * characterBorderRatio)/4.f;
+        final double characterBorderRatio = 1.2f;
+        double characterEdgeInset = (step - diameter * characterBorderRatio)/4.f;
 
         g.setColor(Color.black);
-        g.fillOval((int) (location.x - diameter * characterBorderRatio / 2 + characterEdgeInset), (int) (location.y - diameter * characterBorderRatio / 2 + characterEdgeInset), (int) (diameter * characterBorderRatio), (int)(diameter * characterBorderRatio));
+        g.fillOval(round(location.x - diameter * characterBorderRatio / 2 + characterEdgeInset), round(location.y - diameter * characterBorderRatio / 2 + characterEdgeInset), round(diameter * characterBorderRatio), round(diameter * characterBorderRatio));
 
         g.setColor(character.colour());
-        g.fillOval((int)(location.x - diameter/2 + characterEdgeInset), (int)(location.y - diameter/2 + characterEdgeInset), (int)diameter, (int)diameter);
+        g.fillOval(round(location.x - diameter/2 + characterEdgeInset), round(location.y - diameter/2 + characterEdgeInset), round(diameter), round(diameter));
     }
 
     private void drawAccessibleTilesOverlay(Graphics g, Set<Location<Integer>[]> paths, int startX, int startY, int tileSize) {
@@ -124,6 +128,9 @@ public class GameCanvas extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
 
+        double width = this.getWidth();
+        double height = this.getHeight();
+
         Graphics2D graphics2D = (Graphics2D) g;
 
         //Set  anti-alias!
@@ -136,31 +143,28 @@ public class GameCanvas extends JPanel {
 
         Board board = _gameState.board;
 
-        float ratio = (float)board.width / board.height;
+        double ratio = (double)board.width / board.height;
 
-        int width = this.getWidth();
-        int height = this.getHeight();
+        width = Math.min(width, (height * ratio));
+        height = Math.min(height, (width / ratio));
 
-        width = Math.min(width, (int)(height * ratio));
-        height = Math.min(height, (int)(width / ratio));
-
-        int startX = this.getWidth()/2 - width/2;
-        int startY = this.getHeight()/2 - height/2;
+        double startX = this.getWidth()/2 - width/2;
+        double startY = this.getHeight()/2 - height/2;
 
         g.setColor(Color.yellow);
-        g.fillRect(startX, startY, width, height);
+        g.fillRect(round(startX), round(startY), round(width), round(height));
 
         //Draw grid
 
         g.setColor(Color.black);
 
-        final int step = width / board.width;
+        double step = width / board.width;
 
-        for (int x = startX + step; x < width; x += step) {
-            g.drawLine(x, startY, x, startY + height);
+        for (double x = startX + step; x < startX + width; x += step) {
+            g.drawLine(round(x), round(startY), round(x), round(startY + height));
         }
-        for (int y = startY + step; y < height; y += step) {
-            g.drawLine(startX, y, startX + width, y);
+        for (double y = startY + step; y < startY + height; y += step) {
+            g.drawLine(round(startX), round(y), round(startX + width), round(y));
         }
 
 
@@ -172,7 +176,7 @@ public class GameCanvas extends JPanel {
                 boolean isUnaccessibleSpace = tile.adjacentLocations.isEmpty();
                 if (hasRoom || isUnaccessibleSpace) {
                     g.setColor(hasRoom ? Color.lightGray : Color.cyan);
-                    g.fillRect(x * step + startX, y * step + startY, step, step);
+                    g.fillRect(round(x * step + startX), round(y * step + startY), round(step), round(step));
                 }
 
                 y++;
@@ -192,11 +196,11 @@ public class GameCanvas extends JPanel {
 
 
                 if (board.hasWallBetween(location, new Location<>(x + 1, y))) {
-                    g.fillRect(startX + step * (x + 1) - 2, startY + step * y, WallWidth, step);
+                    g.fillRect(round(startX + step * (x + 1) - 2), round(startY + step * y), WallWidth, round(step));
                 }
 
                 if (board.hasWallBetween(location, new Location<>(x, y + 1))) {
-                    g.fillRect(startX + step * x, startY + step * (y + 1) - 2, step, WallWidth);
+                    g.fillRect(round(startX + step * x), round(startY + step * (y + 1) - 2), round(step), WallWidth);
                 }
 
                 y++;
@@ -205,10 +209,10 @@ public class GameCanvas extends JPanel {
             x++;
         }
 
-        g.fillRect(startX, startY, WallWidth, height);
-        g.fillRect(startX, startY, width, WallWidth);
-        g.fillRect(startX + width - WallWidth, startY, WallWidth, height);
-        g.fillRect(startX, startY + height - WallWidth, width, WallWidth);
+        g.fillRect(round(startX), round(startY), WallWidth, round(height));
+        g.fillRect(round(startX), round(startY), round(width), WallWidth);
+        g.fillRect(round(startX + width - WallWidth), round(startY), WallWidth, round(height));
+        g.fillRect(round(startX), round(startY + height - WallWidth), round(width), WallWidth);
 
 
         g.setFont(GameFont);
@@ -217,8 +221,8 @@ public class GameCanvas extends JPanel {
 
         for (Room room : Room.values()) {
             Location<Float> centre = board.centreLocationForRoom(room);
-            float centreX = (centre.x + 0.5f) * step + startX;
-            float centreY = (centre.y + 0.5f) * step + startY;
+            double centreX = (centre.x + 0.5f) * step + startX;
+            double centreY = (centre.y + 0.5f) * step + startY;
 
             String name = room.shortName().toUpperCase();
 
@@ -234,11 +238,11 @@ public class GameCanvas extends JPanel {
 
                 int lowIndex = (int)Math.floor(_moveSequencePosition);
                 int highIndex = (int)Math.ceil(_moveSequencePosition);
-                float lerpValue = _moveSequencePosition - lowIndex;
+                double lerpValue = _moveSequencePosition - lowIndex;
 
                 Location<Float> startLocation = this.centreForTileAtLocation(_lastPlayerMove.get(lowIndex), board, startX, startY, step);
                 Location<Float> endLocation = this.centreForTileAtLocation(_lastPlayerMove.get(highIndex), board, startX, startY, step);
-                playerLocation = Location.lerp(startLocation, endLocation, lerpValue);
+                playerLocation = Location.lerp(startLocation, endLocation, (float)lerpValue);
 
             } else {
                 playerLocation = this.centreForTileAtLocation(player.location(), board, startX, startY, step);

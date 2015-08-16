@@ -54,13 +54,16 @@ public class DiceView extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int gap = DiceSize/10;
+        int diceSize = Math.min(DiceSize, (int)(this.getWidth()/2.1));
+        int halfDiceSize = diceSize/2;
 
-        int startX = getWidth()/2 - DiceSize; // move back two dice lengths
-        int startY = getHeight()/2 - HalfDiceSize;
+        int gap = diceSize/10;
 
-        drawDice(g2, _split.x, startX, startY, DiceSize);
-        drawDice(g2, _split.y, startX + DiceSize + gap, startY, DiceSize);
+        int startX = getWidth()/2 - diceSize; // move back two dice lengths
+        int startY = getHeight()/2 - halfDiceSize;
+
+        drawDice(g2, _split.x, startX, startY, diceSize);
+        drawDice(g2, _split.y, startX + diceSize + gap, startY, diceSize);
     }
 
 
@@ -80,7 +83,10 @@ public class DiceView extends JPanel {
 
         RoundRectangle2D diceBorder = new RoundRectangle2D.Float(x, y, size, size, 10, 10);
         g2.draw(diceBorder);
+        g2.setColor(Color.white);
+        g2.fill(diceBorder);
 
+        g2.setColor(Color.black);
 
         // positioning variables
         int dotSize = size/6;
