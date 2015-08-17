@@ -15,9 +15,14 @@ import java.util.stream.Collectors;
 public class CluedoGUIController implements CluedoInterface {
 
 
+    private Game _gameState = null;
     private CluedoFrame _cluedoFrame = null;
     private final Object _syncObject = new Object();
 
+    private Set<Location<Integer>> _blockedLocations = null;
+    private Map<Location, Location<Integer>[]> _pathsForTurn = new HashMap<>();
+    private Location<Integer>[] _selectedPath = null;
+    private Set<TurnOption> _possibleOptionsForTurn = Collections.emptySet();
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
 
     /**
@@ -43,6 +48,44 @@ public class CluedoGUIController implements CluedoInterface {
 
     public void setPlayerOptionForTurn(TurnOption optionForTurn) {
         _playerOptionForTurn = Optional.of(optionForTurn);
+    }
+
+    private void setupGUI() {
+                if (_cluedoFrame == null) {
+                    _cluedoFrame = new CluedoFrame();
+                    _cluedoFrame.actionView().setDelegate(new CluedoActionView.ActionDelegate() {
+                        @Override
+                        public void makeASuggestion() {
+                            _playerOptionForTurn = Optional.of(TurnOption.Suggestion);
+                            resumeGameThread();
+                        }
+
+                        @Override
+                        public void endTurn() {
+                            _playerOptionForTurn = Optional.of(TurnOption.EndTurn);
+                            resumeGameThread();
+                        }
+
+                        @Override
+                        public void makeAnAccusation() {
+                            _playerOptionForTurn = Optional.of(TurnOption.Accusation);
+                            resumeGameThread();
+                        }
+
+
+                    });
+
+                    _cluedoFrame.canvas().setDelegate((location) -> {
+                        if (_possibleOptionsForTurn.contains(TurnOption.Move)) {
+                            _playerOptionForTurn = Optional.of(TurnOption.Move);
+
+                            _selectedPath = _pathsForTurn.get(location);
+                            resumeGameThread();
+                        }
+
+                    });
+                }
+
     }
 
     //CluedoInterface response methods. All of these are executed on the game (i.e. second) thread.
@@ -87,14 +130,19 @@ public class CluedoGUIController implements CluedoInterface {
     }
 
     @Override
-    public void notifyStartOfTurn(Player player) {
-        if (_cluedoFrame == null) {
-            SwingUtilities.invokeLater(() -> _cluedoFrame = new CluedoFrame());
-        }
+    public void notifyStartOfTurn(Player player, int diceRoll) {
 
-        JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s's (%s) Turn", player.name, player.character));
+        SwingUtilities.invokeLater(() -> {
 
-        //TODO setup the GUI to show player's cards, roll the dice.
+            this.setupGUI();
+
+            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s's (%s) Turn", player.name.get(), player.character));
+
+            _cluedoFrame.cardView().setCards(
+                    new ArrayList<>(player.cards)
+            );
+            _cluedoFrame.diceView().setDiceValue(diceRoll);
+        });
 
     }
 
@@ -123,13 +171,41 @@ public class CluedoGUIController implements CluedoInterface {
     }
 
     @Override
-    public void showGame(Game game) {
-        _cluedoFrame.canvas.setGameState(game);
+    public void showGame(Game game, List<Player> playersInPlay) {
+        _gameState = game;
+
+        _blockedLocations = playersInPlay.stream().map(Player::location).collect(Collectors.toSet());
+        SwingUtilities.invokeLater(() -> {
+            _cluedoFrame.canvas().setGameState(game);
+            _cluedoFrame.canvas().setAccessibleTilePaths(null);
+        });
     }
 
     @Override
-    public TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleOptions, Player player) {
-        //gui.requestPlayerChoiceForTurn(possibleOptions, player);
+    public TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleOptions, Player player, int remainingMoves) {
+        _playerOptionForTurn = Optional.empty();
+        _possibleOptionsForTurn = possibleOptions;
+
+        //Show the player the accessible tiles if moving is a possible option
+
+        if (possibleOptions.contains(TurnOption.Move)) {
+            Set<Location<Integer>[]> possibleMoves = _gameState.board.pathsFromLocation(player.location(), remainingMoves, _blockedLocations);
+
+            _pathsForTurn.clear();
+            for (Location<Integer>[] path : possibleMoves) {
+                _pathsForTurn.put(path[path.length - 1], path);
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                _cluedoFrame.canvas().setAccessibleTilePaths(possibleMoves);
+            });
+        }
+
+        SwingUtilities.invokeLater(() -> {
+            _cluedoFrame.actionView().accusationButton.setEnabled(possibleOptions.contains(TurnOption.Accusation));
+            _cluedoFrame.actionView().suggestionButton.setEnabled(possibleOptions.contains(TurnOption.Suggestion));
+            _cluedoFrame.actionView().endTurnButton.setEnabled(possibleOptions.contains(TurnOption.EndTurn));
+        });
 
         waitForGUI();
         return _playerOptionForTurn.get();
@@ -138,11 +214,19 @@ public class CluedoGUIController implements CluedoInterface {
     @Override
     public List<Direction> requestPlayerMove(Player player, int distance) {
 
-        List<Direction> move = null; //...;
+        if (distance == 0) {
+            return Collections.emptyList();
+        }
 
-        _cluedoFrame.canvas.setLastPlayerMove(move, player);
+        List<Direction> move = _gameState.board.pathToDirections(_selectedPath);
 
-        return null;
+        SwingUtilities.invokeLater(() -> {
+            _cluedoFrame.diceView().setRemainingValue(distance - move.size());
+        });
+
+        _cluedoFrame.canvas().setLastPlayerMove(move, player);
+
+        return move;
     }
 
     private Optional<Suggestion> getPlayerSuggestion(Optional<Room> room) {

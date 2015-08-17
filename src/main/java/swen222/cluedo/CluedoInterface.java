@@ -32,7 +32,7 @@ public interface CluedoInterface {
     /**
      * Notify that player is about to start their turn.
      */
-    void notifyStartOfTurn(Player player);
+    void notifyStartOfTurn(Player player, int diceRoll);
 
     /**
      * Notify the player that a successful accusation was made.
@@ -59,8 +59,9 @@ public interface CluedoInterface {
      * a text-based implementation might print an ASCII map; a GUI based application would update its GUI.
      *
      * @param game The current game.
+     * @param playersInPlay The players currently playing the game.
      */
-    void showGame(Game game);
+    void showGame(Game game, List<Player> playersInPlay);
 
     /**
      * Ask the player what action they want to take for their turn.
@@ -69,7 +70,7 @@ public interface CluedoInterface {
      * @param player The player to ask
      * @return The action that the player wants to perform.
      */
-    TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleOptions, Player player);
+    TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleOptions, Player player, int remainingMoves);
 
     /**
      * Request a movement on the board that is exactly the given distance.

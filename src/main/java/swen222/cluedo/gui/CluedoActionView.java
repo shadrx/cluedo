@@ -1,15 +1,7 @@
 package swen222.cluedo.gui;
 
 
-import swen222.cluedo.model.card.Card;
-import swen222.cluedo.model.card.CluedoCharacter;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
 import java.util.Optional;
 
 /**
@@ -17,22 +9,47 @@ import java.util.Optional;
  */
 public class CluedoActionView extends JComponent {
 
-    public interface CluedoActionListener {
-        void didMakeSuggestion();
-        void didMakeAccusation();
+    public interface ActionDelegate {
+        void makeAnAccusation();
+        void makeASuggestion();
+        void endTurn();
     }
 
-    private final JButton _makeSuggestion = new JButton("Make a Suggestion");
-    private final JButton _makeAccusation = new JButton("Make an Accusation");
+    public final JButton suggestionButton = new JButton("Make a Suggestion");
+    public final JButton accusationButton = new JButton("Make an Accusation");
+    public final JButton endTurnButton = new JButton("End Turn");
 
-    private Optional<CluedoActionListener> _cluedoActionListener = Optional.empty();
+    private Optional<ActionDelegate> _delegate = Optional.empty();
 
-    public CluedoActionView(Optional<CluedoActionListener> cluedoActionListener) {
-        this._cluedoActionListener = cluedoActionListener;
+    public CluedoActionView(Optional<ActionDelegate> delegate) {
+        _delegate = delegate;
 
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        this.add(_makeAccusation);
-        this.add(_makeSuggestion);
+        this.accusationButton.addActionListener((action) -> {
+            if (_delegate.isPresent()) {
+                _delegate.get().makeAnAccusation();
+            }
+        });
+
+        this.suggestionButton.addActionListener((action) -> {
+            if (_delegate.isPresent()) {
+                _delegate.get().makeASuggestion();
+            }
+        });
+
+        this.endTurnButton.addActionListener((action) -> {
+            if (_delegate.isPresent()) {
+                _delegate.get().endTurn();
+            }
+        });
+
+        this.add(this.accusationButton);
+        this.add(this.suggestionButton);
+        this.add(endTurnButton);
+    }
+
+    public void setDelegate(ActionDelegate delegate) {
+        _delegate = Optional.ofNullable(delegate);
     }
 }

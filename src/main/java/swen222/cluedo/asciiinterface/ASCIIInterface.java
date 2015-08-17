@@ -7,7 +7,6 @@ import swen222.cluedo.model.card.Room;
 import swen222.cluedo.model.card.Weapon;
 import utilities.Pair;
 
-import javax.swing.text.html.Option;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -93,7 +92,7 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public void notifyStartOfTurn(Player player) {
+    public void notifyStartOfTurn(Player player, int diceRoll) {
         this.out.printf("\n\n%s's turn. Your icon is %c.\n", player.character, this.asciiIconForCharacter(player.character));
     }
 
@@ -113,7 +112,7 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public void showGame(Game game) {
+    public void showGame(Game game, List<Player> playersInPlay) {
         Board board = game.board;
 
         char[][] buffer = new char[2 * (board.width + 1)][2 * (board.height + 1)];
@@ -172,7 +171,7 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleActions, Player player) {
+    public TurnOption requestPlayerChoiceForTurn(Set<TurnOption> possibleActions, Player player, int remainingMoves) {
         Stream<TurnOption> sortedOptions = possibleActions.stream()
                                             .sorted((option1, option2) -> option1.toString().compareTo(option2.toString()));
         TurnOption[] sortedOptionsArray = (TurnOption[]) sortedOptions.toArray();

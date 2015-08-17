@@ -24,7 +24,7 @@ class Cluedo {
         //Get the number of players
         CluedoInterface cluedoInterface = new CluedoGUIController();
 
-            int numPlayers = cluedoInterface.getNumberOfPlayers(3, 6);
+            int numPlayers = cluedoInterface.getNumberOfPlayers(1, 6);
 
             //Load the board
             Board board;
@@ -53,9 +53,6 @@ class Cluedo {
 
             Game game = new Game(board, solution, players);
 
-            CluedoFrame frame = new CluedoFrame();
-            frame.canvas.setGameState(game);
-
-            //  game.gameLoop(game.allPlayers);
+            game.gameLoop(game.allPlayers);
     }
 }

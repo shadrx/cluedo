@@ -23,6 +23,8 @@ public enum Weapon implements Card {
         switch (this) {
             case Spanner:
                 return "Wrench.png";
+            case Dagger:
+                return "Knife.png";
             default:
                 return super.toString() + ".png"; //the name as specified in the enum, plus .png
         }

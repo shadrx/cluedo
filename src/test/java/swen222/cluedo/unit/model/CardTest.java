@@ -12,6 +12,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class CardTest {
 
@@ -35,6 +36,13 @@ public class CardTest {
             assertFalse(hand.contains(suggestion.character));
             assertFalse(hand.contains(suggestion.weapon));
             assertFalse(hand.contains(suggestion.room));
+        }
+    }
+
+    @Test
+    public void testEveryCardHasImages() {
+        for (Card card : Card.allCards()) {
+            assertNotNull("Card " + card + " has a null image.", card.cardImage());
         }
     }
 }

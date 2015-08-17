@@ -1,6 +1,5 @@
 package swen222.cluedo.gui;
 
-import swen222.cluedo.model.Game;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
@@ -9,20 +8,21 @@ import swen222.cluedo.model.card.Weapon;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 public class CluedoFrame extends JFrame {
 
-    public GameCanvas canvas;
 
     /**
      * A panel to contain components at the bottom of the frame.
      */
     private JPanel bottomPanel;
 
-    private CluedoActionView actionView;
-    private CardView cardView;
-    private DiceView diceView;
+    private CluedoActionView _actionView;
+    private CardView _cardView;
+    private DiceView _diceView;
+    private GameCanvas _canvas;
 
     public CluedoFrame() {
         super("Cluedo");
@@ -32,29 +32,30 @@ public class CluedoFrame extends JFrame {
     private void createAndShowGUI() {
         // setup the game canvas that draw the board
         this.setLayout(new BorderLayout());
-        this.canvas = new GameCanvas();
-        this.add(canvas, BorderLayout.CENTER);
+        _canvas = new GameCanvas();
+        this.add(_canvas, BorderLayout.CENTER);
 
-        this.actionView = new CluedoActionView(Optional.empty());
+        _actionView = new CluedoActionView(Optional.empty());
 
         // add card view
-        this.cardView = new CardView(Arrays.asList(new Card[]{CluedoCharacter.MrsWhite, Weapon.Rope, Room.Ballroom, CluedoCharacter.ColonelMustard, Weapon.Candlestick}), Optional.empty());
-        this.diceView = new DiceView(7);
+        _cardView = new CardView(Collections.emptyList(), Optional.empty());
+        _diceView = new DiceView(7);
 
         // setup the bottom panel
         this.bottomPanel = new JPanel();
         this.bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
         this.bottomPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        this.bottomPanel.add(diceView, BorderLayout.WEST);
+        this.bottomPanel.add(_diceView, BorderLayout.WEST);
         this.bottomPanel.add(Box.createHorizontalStrut(10));
 
-        JScrollPane cardScrollPane = new JScrollPane(cardView, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane cardScrollPane = new JScrollPane(_cardView, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         cardScrollPane.setOpaque(false);
-        cardScrollPane.setMaximumSize(cardView.getMaximumSize());
+        Dimension cardViewMaxSize = _cardView.getMaximumSize();
+        cardScrollPane.setMaximumSize(new Dimension(cardViewMaxSize.width, Integer.MAX_VALUE));
 
         this.bottomPanel.add(cardScrollPane, BorderLayout.CENTER);
         this.bottomPanel.add(Box.createHorizontalStrut(10));
-        this.bottomPanel.add(actionView, BorderLayout.EAST);
+        this.bottomPanel.add(_actionView, BorderLayout.EAST);
 
         this.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -62,5 +63,21 @@ public class CluedoFrame extends JFrame {
         this.pack();
         this.setResizable(true);
         this.setVisible(true);
+    }
+
+    public CardView cardView() {
+        return _cardView;
+    }
+
+    public DiceView diceView() {
+        return _diceView;
+    }
+
+    public CluedoActionView actionView() {
+        return _actionView;
+    }
+
+    public GameCanvas canvas() {
+        return _canvas;
     }
 }

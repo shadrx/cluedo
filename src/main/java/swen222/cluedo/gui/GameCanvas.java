@@ -35,6 +35,8 @@ public class GameCanvas extends JPanel {
     private CluedoCharacter _lastPlayerMoveCharacter = null;
     private double _moveSequencePosition = -1.f;
 
+    private Set<Location<Integer>[]> _accessibleTilePaths = null;
+
     public GameCanvas() {
         super(true);
 
@@ -84,12 +86,20 @@ public class GameCanvas extends JPanel {
             public void mouseExited(MouseEvent e) {
             }
         });
+    }
 
+    public void setDelegate(TileSelectionDelegate delegate) {
+        _tileSelectionDelegate = Optional.ofNullable(delegate);
     }
 
     public void setGameState(Game gameState) {
         _previousGameState = _gameState;
         _gameState = gameState;
+        this.repaint();
+    }
+
+    public void setAccessibleTilePaths(Set<Location<Integer>[]> paths) {
+        _accessibleTilePaths = paths;
         this.repaint();
     }
 
@@ -161,13 +171,14 @@ public class GameCanvas extends JPanel {
         g.fillOval(round(location.x - diameter/2 + characterEdgeInset), round(location.y - diameter/2 + characterEdgeInset), round(diameter), round(diameter));
     }
 
-    private void drawAccessibleTilesOverlay(Graphics g, Set<Location<Integer>[]> paths, int startX, int startY, int tileSize) {
+    private void drawAccessibleTilesOverlay(Graphics g, Set<Location<Integer>[]> paths, double startX, double startY, double tileSize) {
         for (Location<Integer>[] path : paths) {
             Location<Integer> endTile = path[path.length - 1];
 
-            g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.length/11.f));
+            g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.length/14.f));
 
-            g.fillRect(startX + tileSize * endTile.x, startY + tileSize * endTile.y, tileSize, tileSize);
+            g.fillRect(round(startX + tileSize * endTile.x), round(startY + tileSize * endTile.y), round(tileSize), round(tileSize));
+            g.drawString(String.format("%d", path.length -1), round(startX + tileSize * endTile.x), round(startY + tileSize * endTile.y));
         }
     }
 
@@ -296,6 +307,10 @@ public class GameCanvas extends JPanel {
             }
 
             this.drawPlayer(g, playerLocation, player.character, startX, startY, step);
+        }
+
+        if (_accessibleTilePaths != null) {
+            this.drawAccessibleTilesOverlay(g, _accessibleTilePaths, startX, startY, step);
         }
     }
 

@@ -38,7 +38,6 @@ public class CardView extends JPanel implements MouseListener {
         _cards = cards;
         _cardImages = cards.stream().map(Card::cardImage).collect(Collectors.toList());
 
-
         _imageXs = new Integer[_cardImages.size()];
         int x = 0;
 
@@ -49,6 +48,8 @@ public class CardView extends JPanel implements MouseListener {
             int imageWidth = image.getWidth(null) * PreferredHeight / image.getHeight(null);
             x += imageWidth + CardMargin;
         }
+
+        this.repaint();
     }
 
     @Override

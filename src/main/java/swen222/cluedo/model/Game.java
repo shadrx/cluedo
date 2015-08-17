@@ -7,6 +7,7 @@ import swen222.cluedo.CluedoInterface;
 import swen222.cluedo.model.card.Weapon;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Game {
@@ -117,17 +118,21 @@ public class Game {
         }
     }
 
-    private void performMoveForPlayer(Player player, List<Player> players) {
-        int diceRoll = (int) (Math.floor(Math.random() * 12) + 1);
-
+    /** Returns the remaining number of moves possible. */
+    private int performMoveForPlayer(Player player, List<Player> players, int distance) {
+        int remaining = distance;
         Optional<Location<Integer>> newLocation = Optional.empty();
         while (!newLocation.isPresent()) {
-            List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, diceRoll);
-            Stream<Location<Integer>> otherPlayerLocations = players.stream().filter(player1 -> player1 != player)
-                    .map(Player::location);
+            List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, distance);
+            Set<Location<Integer>> otherPlayerLocations = players.stream()
+                    .filter(player1 -> player1 != player)
+                    .map(Player::location)
+                    .collect(Collectors.toSet());
             newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);
+            remaining = moveSequence.size();
         }
         player.setLocation(newLocation.get());
+        return remaining;
     }
 
     public void gameLoop(List<Player> players) {
@@ -139,11 +144,14 @@ public class Game {
         while (true) {
             for (Player player : players) {
 
-                player.cluedoInterface.notifyStartOfTurn(player);
+                int diceRoll = (int) (Math.floor(Math.random() * 11) + 2);
+                int remaining = diceRoll;
 
-                EnumSet<TurnOption> possibleActions = EnumSet.of(TurnOption.EndTurn, TurnOption.Move);
+                player.cluedoInterface.notifyStartOfTurn(player, diceRoll);
 
-                player.cluedoInterface.showGame(this);
+                EnumSet<TurnOption> possibleActions = EnumSet.of(TurnOption.EndTurn, TurnOption.Move, TurnOption.Accusation);
+
+                player.cluedoInterface.showGame(this, players);
 
                 while (!possibleActions.isEmpty()) {
 
@@ -153,7 +161,7 @@ public class Game {
                         possibleActions.add(TurnOption.Suggestion);
                     }
 
-                    switch (player.cluedoInterface.requestPlayerChoiceForTurn(possibleActions, player)) {
+                    switch (player.cluedoInterface.requestPlayerChoiceForTurn(possibleActions, player, remaining)) {
                         case Accusation:
                             if (this.checkForAccusation(players, player)) {
                                 return;
@@ -167,8 +175,10 @@ public class Game {
                             possibleActions.clear();
                             break;
                         case Move:
-                            this.performMoveForPlayer(player, players);
-                            possibleActions.remove(TurnOption.Move);
+                            remaining = this.performMoveForPlayer(player, players, remaining);
+                            if (remaining == 0) {
+                                possibleActions.remove(TurnOption.Move);
+                            }
                             break;
                     }
                 }

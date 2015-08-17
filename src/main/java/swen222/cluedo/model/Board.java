@@ -161,11 +161,6 @@ public class Board {
 
         queue.add(location);
 
-//        for (int x = 0; x < this.width; x++) {
-//            for (int y = 0; y < this.height; y++) {
-//                queue.add(new Location<>(x, y));
-//            }
-//        }
 
         while (!queue.isEmpty()) {
             Location<Integer> currentLocation = queue.poll();
@@ -192,6 +187,26 @@ public class Board {
             }
         }
         return paths;
+    }
+
+    public List<Direction> pathToDirections(Location<Integer>[] path) {
+        List<Direction> directions = new ArrayList<>();
+
+        for (int i = 0; i < path.length - 1; i++) {
+            Location<Integer> from = path[i];
+            Location<Integer> to = path[i + 1];
+            Tile fromTile = this.tileAtLocation(from);
+            Direction direction = null;
+            for (Map.Entry<Direction, Location<Integer>> entry : fromTile.adjacentLocations.entrySet()) {
+                if (entry.getValue().equals(to)) {
+                    direction = entry.getKey();
+                    break;
+                }
+            }
+
+            directions.add(direction);
+        }
+        return directions;
     }
 
     private Room roomForCharacter(char c) {
@@ -292,8 +307,8 @@ public class Board {
      * @param startLocation the location from which this move sequence goes
      * @return The new location, if the move sequence is valid; else, the empty optional.
      */
-    public Optional<Location<Integer>> newLocationForMove(List<Direction> move, Location<Integer> startLocation, Stream<Location<Integer>> blockedLocations) {
-        if (blockedLocations.anyMatch(location -> location.equals(startLocation))) {
+    public Optional<Location<Integer>> newLocationForMove(List<Direction> move, Location<Integer> startLocation, Set<Location<Integer>> blockedLocations) {
+        if (blockedLocations.contains(startLocation)) {
             return Optional.empty();
         }
         if (move.size() > 0) {
