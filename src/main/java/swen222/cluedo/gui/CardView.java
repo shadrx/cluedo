@@ -19,6 +19,7 @@ public class CardView extends JPanel implements MouseListener {
 
     private static final int CardMargin = 20;
     private static final int PreferredHeight = 220;
+    private static final long MinimumWidth = (long)(0.6 * PreferredHeight); //width is 0.6 times the height
 
     private List<Card> _cards;
     private List<Image> _cardImages;
@@ -49,6 +50,7 @@ public class CardView extends JPanel implements MouseListener {
             x += imageWidth + CardMargin;
         }
 
+        this.invalidate();
         this.repaint();
     }
 
@@ -66,7 +68,10 @@ public class CardView extends JPanel implements MouseListener {
     public Dimension getPreferredSize() {
         long width = CardMargin * (_cards.size() - 1);
         width = _cardImages.stream().reduce(width, (sum, image) -> sum + image.getWidth(null) * PreferredHeight / image.getHeight(null), Long::sum);
-        return new Dimension((int)width, PreferredHeight);
+
+        long constrainedWidth = Math.max(width, MinimumWidth); //Set a minimum width if there are no cards.
+
+        return new Dimension((int)constrainedWidth, PreferredHeight);
     }
 
     @Override

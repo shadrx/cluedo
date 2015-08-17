@@ -5,6 +5,8 @@ import utilities.Pair;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.*;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.*;
 import java.util.List;
@@ -16,10 +18,13 @@ public class DiceView extends JPanel {
 
     private static final int DiceSize = 50;
     private static final int HalfDiceSize = DiceSize/2;
+    private static final int Margin = 10;
+
+    private static final Font DiceViewFont = new Font("Verdana", Font.PLAIN, 12);
 
     private Pair<Integer, Integer> _split;
 
-    private int _remainingValue;
+    private int _diceValue;
 
     public DiceView(int diceValue) {
         this.setDiceValue(diceValue);
@@ -32,12 +37,9 @@ public class DiceView extends JPanel {
      */
     public void setDiceValue(int value) {
 
-        int leftDie = (int)(Math.random() * (value - 1)) + 1;
-        int rightDie = value - leftDie;
+        _diceValue = value;
 
-        _split = new Pair<>(leftDie, rightDie);
-
-        repaint();
+        this.setRemainingValue(value);
     }
 
     /**
@@ -46,7 +48,12 @@ public class DiceView extends JPanel {
      * @param remainingValue the remaining amount of value that can be used
      */
     public void setRemainingValue(int remainingValue) {
-        this._remainingValue = remainingValue;
+        int leftDie = (int)Math.floor(Math.random() * (Math.min(remainingValue, 7) - 1)) + 1;
+        int rightDie = remainingValue - leftDie;
+
+        _split = new Pair<>(leftDie, rightDie);
+
+        repaint();
     }
 
     @Override
@@ -65,6 +72,16 @@ public class DiceView extends JPanel {
 
         drawDice(g2, _split.x, startX, startY, diceSize);
         drawDice(g2, _split.y, startX + diceSize + gap, startY, diceSize);
+
+        g2.setFont(DiceViewFont);
+
+        final String subtitle = String.format("of %d remaining", _diceValue);
+        FontMetrics fontMetrics = g2.getFontMetrics(DiceViewFont);
+        Rectangle2D stringBounds = fontMetrics.getStringBounds(subtitle, g2);
+
+        int stringX = (int)(this.getWidth()/2 - stringBounds.getCenterX());
+        int stringY = (int)(this.getHeight()/2 + HalfDiceSize + Margin + stringBounds.getHeight());
+        g2.drawString(subtitle, stringX, stringY);
     }
 
 
@@ -78,8 +95,8 @@ public class DiceView extends JPanel {
      * @param size the size of the dice
      */
     private void drawDice(Graphics2D g2, int value, int x, int y, int size) {
-        if (value <= 0 || value > 6) {
-            throw new IllegalArgumentException("Face value for dice must be between 1-6");
+        if (value < 0 || value > 6) {
+            throw new IllegalArgumentException("Face value for dice must be between 0-6");
         }
 
         RoundRectangle2D diceBorder = new RoundRectangle2D.Float(x, y, size, size, 10, 10);

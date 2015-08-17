@@ -136,22 +136,22 @@ public class GameCanvas extends JPanel {
      * Returns the location, in pixels, of the centre of a tile at a given location, taking the walls into account.
      */
     private Location<Float> centreForTileAtLocation(Location<Integer> location, Board board, double startX, double startY, double tileSize) {
-        double tileCentreX = tileSize/2.f;
-        double tileCentreY = tileSize/2.f;
+        double tileCentreX = tileSize/2.0;
+        double tileCentreY = tileSize/2.0;
 
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Up))) {
-            tileCentreY += WallWidth/4.f;
+            tileCentreY += WallWidth/4.0;
         }
 
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Down))) {
-            tileCentreY -= WallWidth/4.f;
+            tileCentreY -= WallWidth/4.0;
         }
 
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Left))) {
-            tileCentreX += WallWidth/4.f;
+            tileCentreX += WallWidth/4.0;
         }
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Right))) {
-            tileCentreX -= WallWidth/4.f;
+            tileCentreX -= WallWidth/4.0;
         }
 
 
@@ -159,10 +159,13 @@ public class GameCanvas extends JPanel {
     }
 
     private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, double startX, double startY, double step) {
+
+        //TODO these are not correctly centered and sometimes lack borders.
+
         double diameter = step * PlayerDiameterRatio;
 
-        final double characterBorderRatio = 1.2f;
-        double characterEdgeInset = (step - diameter * characterBorderRatio)/4.f;
+        final double characterBorderRatio = 1.0f;
+        double characterEdgeInset = (step - diameter * characterBorderRatio)/4.0;
 
         g.setColor(Color.black);
         g.fillOval(round(location.x - diameter * characterBorderRatio / 2 + characterEdgeInset), round(location.y - diameter * characterBorderRatio / 2 + characterEdgeInset), round(diameter * characterBorderRatio), round(diameter * characterBorderRatio));
@@ -190,11 +193,8 @@ public class GameCanvas extends JPanel {
 
         Graphics2D graphics2D = (Graphics2D) g;
 
-        //Set  anti-alias!
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Set anti-alias for text
         graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
