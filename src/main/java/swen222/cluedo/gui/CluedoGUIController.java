@@ -8,7 +8,6 @@ import swen222.cluedo.model.card.Room;
 import utilities.Pair;
 
 import javax.swing.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -149,7 +148,7 @@ public class CluedoGUIController implements CluedoInterface {
     @Override
     public void notifySuccess(Player player) {
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made a correct accusation and has won!", player.name), String.format("%s has Won!", player.name), JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made a correct accusation and has won!", player.name.get()), String.format("%s has Won!", player.name.get()), JOptionPane.PLAIN_MESSAGE);
             _cluedoFrame.dispose();
         });
     }
@@ -157,7 +156,7 @@ public class CluedoGUIController implements CluedoInterface {
     @Override
     public void notifyFailure(Player player) {
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing.", player.name), String.format("%s Made an Incorrect Accusation", player.name), JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing.", player.name.get()), String.format("%s Made an Incorrect Accusation", player.name), JOptionPane.PLAIN_MESSAGE);
             _cluedoFrame.dispose();
         });
     }
@@ -215,25 +214,22 @@ public class CluedoGUIController implements CluedoInterface {
     @Override
     public List<Direction> requestPlayerMove(Player player, int distance) {
 
-        if (distance == 0) {
+        if (distance == 0 || _selectedPath == null) {
             return Collections.emptyList();
         }
 
         List<Direction> move = _gameState.board.pathToDirections(_selectedPath);
 
-        SwingUtilities.invokeLater(() -> {
-            _cluedoFrame.diceView().setRemainingValue(distance - move.size());
-        });
+        SwingUtilities.invokeLater(() -> _cluedoFrame.diceView().setRemainingValue(distance - move.size()));
 
         _cluedoFrame.canvas().setLastPlayerMove(move, player);
 
         return move;
     }
 
-    private Optional<Suggestion> getPlayerSuggestion(Optional<Room> room) {
+    private Optional<Suggestion> getPlayerSuggestion(Player player, Optional<Room> room) {
         @SuppressWarnings("unchecked")
         final Optional<Suggestion>[] retVal = new Optional[]{null};
-
 
         SwingUtilities.invokeLater(() -> new PlayerSuggestionDialog(_cluedoFrame, new PlayerSuggestionDialog.PlayerSuggestionDelegate() {
             @Override
@@ -248,6 +244,7 @@ public class CluedoGUIController implements CluedoInterface {
                 resumeGameThread();
             }
         },
+                player,
                 room));
 
         waitForGUI();
@@ -257,12 +254,12 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public Optional<Suggestion> requestPlayerAccusation(Player player) {
-        return this.getPlayerSuggestion(Optional.empty());
+        return this.getPlayerSuggestion(player, Optional.empty());
     }
 
     @Override
     public Optional<Suggestion> requestPlayerSuggestion(Player player, Room room) {
-        return this.getPlayerSuggestion(Optional.of(room));
+        return this.getPlayerSuggestion(player, Optional.of(room));
     }
 
     @Override

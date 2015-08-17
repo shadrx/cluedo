@@ -114,7 +114,7 @@ public class GameCanvas extends JPanel {
         _lastPlayerMove.add(previousLocation);
 
         for (Direction direction : move) {
-            Location<Integer> nextLocation = previousLocation.locationInDirection(direction);
+            Location<Integer> nextLocation = previousLocation.locationInDirection(direction); //Convert the list of directions to a list of locations.
             _lastPlayerMove.add(nextLocation);
             previousLocation = nextLocation;
         }
@@ -140,18 +140,18 @@ public class GameCanvas extends JPanel {
         double tileCentreY = tileSize/2.f;
 
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Up))) {
-            tileCentreY += WallWidth/2.f;
+            tileCentreY += WallWidth/4.f;
         }
 
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Down))) {
-            tileCentreY -= WallWidth/2.f;
+            tileCentreY -= WallWidth/4.f;
         }
 
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Left))) {
-            tileCentreX += WallWidth/2.f;
+            tileCentreX += WallWidth/4.f;
         }
         if (board.hasWallBetween(location, location.locationInDirection(Direction.Right))) {
-            tileCentreX -= WallWidth/2.f;
+            tileCentreX -= WallWidth/4.f;
         }
 
 
@@ -289,7 +289,7 @@ public class GameCanvas extends JPanel {
 
         boolean shouldPlayMoveSequence = this.shouldPlayMoveSequence();
         for (Player player : _gameState.allPlayers) {
-            Location<Float> playerLocation = null;
+            Location<Float> playerLocation;
             if (shouldPlayMoveSequence && //We haven't finished animating the move
                     player.character == _lastPlayerMoveCharacter) { //The move is for this character
 

@@ -8,12 +8,11 @@ import swen222.cluedo.model.card.Weapon;
 import utilities.SpringUtilities;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.html.Option;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 
 public class PlayerSuggestionDialog extends JDialog {
 
@@ -23,7 +22,6 @@ public class PlayerSuggestionDialog extends JDialog {
     }
 
     private final Optional<PlayerSuggestionDelegate> _delegate;
-    private boolean _roomIsLocked = false;
 
     private CluedoCharacter _character;
     private Weapon _weapon;
@@ -35,7 +33,7 @@ public class PlayerSuggestionDialog extends JDialog {
      * @param delegate The (optional) delegate, to be notified when the player has made their suggestion.
      * @param room If the room is present, it is considered a suggestion; otherwise, it's an accusation.
      */
-    public PlayerSuggestionDialog(JFrame parent, PlayerSuggestionDelegate delegate, Optional<Room> room) {
+    public PlayerSuggestionDialog(JFrame parent, PlayerSuggestionDelegate delegate, Player player, Optional<Room> room) {
         super(parent, room.isPresent() ? "Make a Suggestion" : "Make an Accusation");
         _delegate = Optional.ofNullable(delegate);
 
@@ -48,28 +46,66 @@ public class PlayerSuggestionDialog extends JDialog {
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
 
+        this.add(this.setupDataEntryPanel(player, room), BorderLayout.CENTER);
+
+
+        this.add(this.setupButtonsPanel(), BorderLayout.SOUTH);
+
+        //Display the window.
+        this.pack();
+        this.setVisible(true);
+    }
+
+    private JPanel setupDataEntryPanel(Player player, Optional<Room> room) {
         JPanel dataEntryPanel = new JPanel(new SpringLayout());
 
         JLabel characterLabel = new JLabel(room.isPresent() ? "You suggest it was done by" : "You accuse", JLabel.TRAILING);
         dataEntryPanel.add(characterLabel);
-        CluedoCharacter[] allCharacters = CluedoCharacter.values();
-        JComboBox<CluedoCharacter> characterComboBox = new JComboBox<>(allCharacters);
-        characterComboBox.addActionListener((action) -> _character = (CluedoCharacter)characterComboBox.getSelectedItem());
+
+        CluedoCharacter[] characters = CluedoCharacter.values();
+
+        if (!room.isPresent()) { //it's an accusation, so remove the player's cards.
+            List<CluedoCharacter> characterList = new ArrayList<>(Arrays.asList(characters));
+            characterList.removeIf((player.cards::contains));
+            characters = characterList.toArray(new CluedoCharacter[characterList.size()]);
+        }
+        _character = characters[0];
+
+        JComboBox<CluedoCharacter> characterComboBox = new JComboBox<>(characters);
+        characterComboBox.addActionListener((action) -> _character = (CluedoCharacter) characterComboBox.getSelectedItem());
         dataEntryPanel.add(characterComboBox);
         characterLabel.setLabelFor(characterComboBox);
 
-
         JLabel weaponLabel = new JLabel(room.isPresent() ? "with the" : "of using the", JLabel.TRAILING);
         dataEntryPanel.add(weaponLabel);
-        Weapon[] allWeapons = Weapon.values();
-        JComboBox<Weapon> weaponComboBox = new JComboBox<>(allWeapons);
-        weaponComboBox.addActionListener((action) -> _weapon = (Weapon)weaponComboBox.getSelectedItem());
+        Weapon[] weapons = Weapon.values();
+
+        if (!room.isPresent()) { //it's an accusation, so remove the player's cards.
+            List<Weapon> weaponList = new ArrayList<>(Arrays.asList(weapons));
+            weaponList.removeIf((player.cards::contains));
+            weapons = weaponList.toArray(new Weapon[weaponList.size()]);
+        }
+
+        _weapon = weapons[0];
+
+        JComboBox<Weapon> weaponComboBox = new JComboBox<>(weapons);
+        weaponComboBox.addActionListener((action) -> _weapon = (Weapon) weaponComboBox.getSelectedItem());
         dataEntryPanel.add(weaponComboBox);
         weaponLabel.setLabelFor(weaponComboBox);
 
         JLabel roomLabel = new JLabel("in the", JLabel.TRAILING);
         dataEntryPanel.add(roomLabel);
+
         Room[] rooms = room.isPresent() ? new Room[]{room.get()} : Room.values();
+
+        if (!room.isPresent()) { //it's an accusation, so remove the player's cards.
+            List<Room> roomList = new ArrayList<>(Arrays.asList(rooms));
+            roomList.removeIf((player.cards::contains));
+            rooms = roomList.toArray(new Room[roomList.size()]);
+        }
+
+        _room = rooms[0];
+
         JComboBox<Room> roomComboBox = new JComboBox<>(rooms);
         roomComboBox.setEnabled(!room.isPresent());
         roomComboBox.addActionListener((action) -> _room = (Room) roomComboBox.getSelectedItem());
@@ -82,9 +118,10 @@ public class PlayerSuggestionDialog extends JDialog {
                 6, 6,        //initX, initY
                 6, 6);       //xPad, yPad
 
-        this.add(dataEntryPanel, BorderLayout.CENTER);
+        return dataEntryPanel;
+    }
 
-
+    private JPanel setupButtonsPanel() {
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 
@@ -110,10 +147,6 @@ public class PlayerSuggestionDialog extends JDialog {
         });
         buttonsPanel.add(closeButton);
 
-        this.add(buttonsPanel, BorderLayout.SOUTH);
-
-        //Display the window.
-        this.pack();
-        this.setVisible(true);
+        return buttonsPanel;
     }
 }
