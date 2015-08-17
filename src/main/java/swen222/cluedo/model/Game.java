@@ -129,7 +129,7 @@ public class Game {
                     .map(Player::location)
                     .collect(Collectors.toSet());
             newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);
-            remaining = moveSequence.size();
+            remaining = distance - moveSequence.size();
         }
         player.setLocation(newLocation.get());
         return remaining;
@@ -178,6 +178,9 @@ public class Game {
                             remaining = this.performMoveForPlayer(player, players, remaining);
                             if (remaining == 0) {
                                 possibleActions.remove(TurnOption.Move);
+                            }
+                            if (!this.board.tileAtLocation(player.location()).room.isPresent()) {
+                                possibleActions.remove(TurnOption.Suggestion);
                             }
                             break;
                     }

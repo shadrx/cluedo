@@ -188,20 +188,21 @@ public class CluedoGUIController implements CluedoInterface {
 
         //Show the player the accessible tiles if moving is a possible option
 
+        Set<Location<Integer>[]> possibleMoves;
         if (possibleOptions.contains(TurnOption.Move)) {
-            Set<Location<Integer>[]> possibleMoves = _gameState.board.pathsFromLocation(player.location(), remainingMoves, _blockedLocations);
+            possibleMoves = _gameState.board.pathsFromLocation(player.location(), remainingMoves, _blockedLocations);
 
             _pathsForTurn.clear();
             for (Location<Integer>[] path : possibleMoves) {
                 _pathsForTurn.put(path[path.length - 1], path);
             }
-
-            SwingUtilities.invokeLater(() -> {
-                _cluedoFrame.canvas().setAccessibleTilePaths(possibleMoves);
-            });
+        } else {
+            possibleMoves = null;
         }
 
         SwingUtilities.invokeLater(() -> {
+            _cluedoFrame.canvas().setAccessibleTilePaths(possibleMoves);
+
             _cluedoFrame.actionView().accusationButton.setEnabled(possibleOptions.contains(TurnOption.Accusation));
             _cluedoFrame.actionView().suggestionButton.setEnabled(possibleOptions.contains(TurnOption.Suggestion));
             _cluedoFrame.actionView().endTurnButton.setEnabled(possibleOptions.contains(TurnOption.EndTurn));

@@ -178,7 +178,6 @@ public class GameCanvas extends JPanel {
             g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.length/14.f));
 
             g.fillRect(round(startX + tileSize * endTile.x), round(startY + tileSize * endTile.y), round(tileSize), round(tileSize));
-            g.drawString(String.format("%d", path.length -1), round(startX + tileSize * endTile.x), round(startY + tileSize * endTile.y));
         }
     }
 
@@ -234,7 +233,7 @@ public class GameCanvas extends JPanel {
                 boolean isUnaccessibleSpace = tile.adjacentLocations.isEmpty();
                 if (hasRoom || isUnaccessibleSpace) {
                     g.setColor(hasRoom ? Color.lightGray : Color.cyan);
-                    g.fillRect(round(x * step + startX), round(y * step + startY), round(step), round(step));
+                    g.fillRect(round(x * step + startX - 0.5), round(y * step + startY - 0.5), round(step + 1), round(step + 1));
                 }
 
                 y++;
@@ -252,13 +251,12 @@ public class GameCanvas extends JPanel {
             for (Board.Tile tile : column) {
                 Location<Integer> location = new Location<>(x, y);
 
-
                 if (board.hasWallBetween(location, new Location<>(x + 1, y))) {
-                    g.fillRect(round(startX + step * (x + 1) - 2), round(startY + step * y), WallWidth, round(step));
+                    g.fillRect(round(startX + step * (x + 1) - WallWidth/2), round(startY + step * y - 0.5), WallWidth, round(step + 1));
                 }
 
                 if (board.hasWallBetween(location, new Location<>(x, y + 1))) {
-                    g.fillRect(round(startX + step * x), round(startY + step * (y + 1) - 2), round(step), WallWidth);
+                    g.fillRect(round(startX + step * x - 0.5), round(startY + step * (y + 1) - WallWidth/2), round(step + 1), WallWidth);
                 }
 
                 y++;
@@ -289,9 +287,10 @@ public class GameCanvas extends JPanel {
             g.drawString(name, (int)(centreX - bounds.getCenterX()), (int)(centreY - bounds.getCenterY()));
         }
 
+        boolean shouldPlayMoveSequence = this.shouldPlayMoveSequence();
         for (Player player : _gameState.allPlayers) {
             Location<Float> playerLocation = null;
-            if (this.shouldPlayMoveSequence() && //We haven't finished animating the move
+            if (shouldPlayMoveSequence && //We haven't finished animating the move
                     player.character == _lastPlayerMoveCharacter) { //The move is for this character
 
                 int lowIndex = (int)Math.floor(_moveSequencePosition);
@@ -309,7 +308,7 @@ public class GameCanvas extends JPanel {
             this.drawPlayer(g, playerLocation, player.character, startX, startY, step);
         }
 
-        if (_accessibleTilePaths != null) {
+        if (_accessibleTilePaths != null && !shouldPlayMoveSequence) {
             this.drawAccessibleTilesOverlay(g, _accessibleTilePaths, startX, startY, step);
         }
     }
