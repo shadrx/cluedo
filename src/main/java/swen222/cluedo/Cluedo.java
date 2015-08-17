@@ -24,7 +24,7 @@ class Cluedo {
         //Get the number of players
         CluedoInterface cluedoInterface = new CluedoGUIController();
 
-            int numPlayers = cluedoInterface.getNumberOfPlayers(1, 6);
+            int numPlayers = cluedoInterface.getNumberOfPlayers(3, 6);
 
             //Load the board
             Board board;

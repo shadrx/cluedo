@@ -101,7 +101,7 @@ public class Game {
         return false;
     }
 
-    private void checkForSuggestion(Player player, Room room) {
+    private boolean checkForSuggestion(Player player, Room room) {
         Optional<Suggestion> suggestion = player.cluedoInterface.requestPlayerSuggestion(player, room);
         if (suggestion.isPresent()) {
             SuggestionResponse response = SuggestionResponse.UnableToDisprove();
@@ -115,7 +115,9 @@ public class Game {
             }
 
             player.cluedoInterface.notifyPlayerResponse(player, response);
+            return true;
         }
+        return false;
     }
 
     /** Returns the remaining number of moves possible. */
@@ -168,8 +170,10 @@ public class Game {
                             }
                             break;
                         case Suggestion:
-                            this.checkForSuggestion(player, tile.room.get());
-                            possibleActions.remove(TurnOption.Move);
+                            if (this.checkForSuggestion(player, tile.room.get())) {
+                                possibleActions.remove(TurnOption.Move);
+                                possibleActions.remove(TurnOption.Suggestion);
+                            }
                             break;
                         case EndTurn:
                             possibleActions.clear();
