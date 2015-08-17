@@ -31,10 +31,11 @@ public class DiceView extends JPanel {
      * @param value the value to display between the two dice
      */
     public void setDiceValue(int value) {
-        // generate a random split of the values for each dice face. there is a better way.
-        List<Pair<Integer, Integer>> possibleFaceValues = splitDiceValueMap.get(value);
-        Collections.shuffle(possibleFaceValues);
-        _split = possibleFaceValues.get(0);
+
+        int leftDie = (int)(Math.random() * (value - 1)) + 1;
+        int rightDie = value - leftDie;
+
+        _split = new Pair<>(leftDie, rightDie);
 
         repaint();
     }
@@ -134,23 +135,4 @@ public class DiceView extends JPanel {
         return new Dimension(200, 100);
     }
 
-
-    private static final Map<Integer, List<Pair<Integer, Integer>>> splitDiceValueMap;
-    static {
-        Map<Integer, List<Pair<Integer, Integer>>> splitDiceValueMapModifiable = new HashMap<>();
-
-        for (int i = 1; i <= 6; i++) {
-            for (int j = 1; j <= 6; j++) {
-                int sum = i + j;
-                List<Pair<Integer, Integer>> numbersForSum = splitDiceValueMapModifiable.get(sum);
-                if (numbersForSum == null) {
-                    numbersForSum = new ArrayList<>();
-                    splitDiceValueMapModifiable.put(sum, numbersForSum);
-                }
-
-                numbersForSum.add(new Pair<>(i, j));
-            }
-        }
-        splitDiceValueMap = Collections.unmodifiableMap(splitDiceValueMapModifiable);
-    }
 }

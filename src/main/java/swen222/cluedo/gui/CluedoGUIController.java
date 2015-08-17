@@ -141,6 +141,7 @@ public class CluedoGUIController implements CluedoInterface {
                     new ArrayList<>(player.cards)
             );
             _cluedoFrame.diceView().setDiceValue(diceRoll);
+
         });
 
     }

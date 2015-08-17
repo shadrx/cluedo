@@ -26,6 +26,10 @@ public class CluedoActionView extends JComponent {
 
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
+        this.suggestionButton.setAlignmentX(CENTER_ALIGNMENT);
+        this.accusationButton.setAlignmentX(CENTER_ALIGNMENT);
+        this.endTurnButton.setAlignmentX(CENTER_ALIGNMENT);
+
         this.accusationButton.addActionListener((action) -> {
             if (_delegate.isPresent()) {
                 _delegate.get().makeAnAccusation();
