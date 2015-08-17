@@ -35,6 +35,8 @@ public class PlayerSuggestionDialog extends JDialog {
      */
     public PlayerSuggestionDialog(JFrame parent, PlayerSuggestionDelegate delegate, Player player, Optional<Room> room) {
         super(parent, room.isPresent() ? "Make a Suggestion" : "Make an Accusation");
+        this.setModalityType(ModalityType.APPLICATION_MODAL);
+
         _delegate = Optional.ofNullable(delegate);
 
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -53,6 +55,8 @@ public class PlayerSuggestionDialog extends JDialog {
 
         //Display the window.
         this.pack();
+
+        this.setLocationRelativeTo(parent);
         this.setVisible(true);
     }
 

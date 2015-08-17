@@ -12,7 +12,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class GameCanvas extends JPanel {
 
@@ -21,12 +20,11 @@ public class GameCanvas extends JPanel {
     }
 
     private static final int WallWidth = 4;
-    private static final double PlayerDiameterRatio = 0.7f; //0.7 * the size of the tile.
-    private static final Font GameFont = new Font("Verdana", Font.BOLD, 14);
+    private static final double PlayerDiameterRatio = 0.6f; //0.7 * the size of the tile.
+    private static final Font GameFont = new Font(null, Font.BOLD, 14);
 
     private static final double TilesPerMillisecond = 6.f/1000.f;
 
-    private Game _previousGameState = null;
     private Game _gameState = null;
 
     private Optional<TileSelectionDelegate> _tileSelectionDelegate;
@@ -93,7 +91,6 @@ public class GameCanvas extends JPanel {
     }
 
     public void setGameState(Game gameState) {
-        _previousGameState = _gameState;
         _gameState = gameState;
         this.repaint();
     }
@@ -104,7 +101,7 @@ public class GameCanvas extends JPanel {
     }
 
     private boolean shouldPlayMoveSequence() {
-        return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1 && !_gameState.equals(_previousGameState);
+        return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1;
     }
 
     public void setLastPlayerMove(List<Direction> move, Player player) {
@@ -158,20 +155,19 @@ public class GameCanvas extends JPanel {
         return new Location<>((float)(startX + tileSize * location.x + tileCentreX),(float)(startY + tileSize * location.y + tileCentreY));
     }
 
-    private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, double startX, double startY, double step) {
+    private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, double step) {
 
         //TODO these are not correctly centered and sometimes lack borders.
 
         double diameter = step * PlayerDiameterRatio;
 
-        final double characterBorderRatio = 1.0f;
-        double characterEdgeInset = (step - diameter * characterBorderRatio)/4.0;
+        final double characterBorderRatio = 1.2f;
 
         g.setColor(Color.black);
-        g.fillOval(round(location.x - diameter * characterBorderRatio / 2 + characterEdgeInset), round(location.y - diameter * characterBorderRatio / 2 + characterEdgeInset), round(diameter * characterBorderRatio), round(diameter * characterBorderRatio));
+        g.fillOval(round(location.x - diameter * characterBorderRatio / 2), round(location.y - diameter * characterBorderRatio / 2), round(diameter * characterBorderRatio), round(diameter * characterBorderRatio));
 
         g.setColor(character.colour());
-        g.fillOval(round(location.x - diameter/2 + characterEdgeInset), round(location.y - diameter/2 + characterEdgeInset), round(diameter), round(diameter));
+        g.fillOval(round(location.x - diameter/2), round(location.y - diameter/2), round(diameter), round(diameter));
     }
 
     private void drawAccessibleTilesOverlay(Graphics g, Set<Location<Integer>[]> paths, double startX, double startY, double tileSize) {
@@ -305,7 +301,8 @@ public class GameCanvas extends JPanel {
                 playerLocation = this.centreForTileAtLocation(player.location(), board, startX, startY, step);
             }
 
-            this.drawPlayer(g, playerLocation, player.character, startX, startY, step);
+            this.drawPlayer(g, playerLocation, player.character, step);
+
         }
 
         if (_accessibleTilePaths != null && !shouldPlayMoveSequence) {

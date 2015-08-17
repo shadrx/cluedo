@@ -20,7 +20,7 @@ public class DiceView extends JPanel {
     private static final int HalfDiceSize = DiceSize/2;
     private static final int Margin = 10;
 
-    private static final Font DiceViewFont = new Font("Verdana", Font.PLAIN, 12);
+    private static final Font DiceViewFont = new Font(null, Font.PLAIN, 12);
 
     private Pair<Integer, Integer> _split;
 
@@ -50,6 +50,11 @@ public class DiceView extends JPanel {
     public void setRemainingValue(int remainingValue) {
         int leftDie = (int)Math.floor(Math.random() * (Math.min(remainingValue, 7) - 1)) + 1;
         int rightDie = remainingValue - leftDie;
+
+        while (rightDie > 6) {
+            rightDie--;
+            leftDie++;
+        }
 
         _split = new Pair<>(leftDie, rightDie);
 
@@ -96,7 +101,7 @@ public class DiceView extends JPanel {
      */
     private void drawDice(Graphics2D g2, int value, int x, int y, int size) {
         if (value < 0 || value > 6) {
-            throw new IllegalArgumentException("Face value for dice must be between 0-6");
+            throw new IllegalArgumentException("Face value for dice must be between 0-6 for pair " + _split.x + ", " +  _split.y);
         }
 
         RoundRectangle2D diceBorder = new RoundRectangle2D.Float(x, y, size, size, 10, 10);

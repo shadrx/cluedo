@@ -14,6 +14,8 @@ public class MessageAndCardDialog extends JDialog {
     private static final int VerticalGap = 10;
     public MessageAndCardDialog(Frame parent, String title, String message, boolean showCloseButton, List<Card> cards, CardView.CardListener cardListener) {
         super(parent, title, true);
+        this.setModalityType(ModalityType.APPLICATION_MODAL);
+
         this.message = message;
         this.cards = cards;
 
@@ -70,6 +72,7 @@ public class MessageAndCardDialog extends JDialog {
                         ((closeButton != null) ? closeButton.getPreferredSize().height : 0) +
                         4 * VerticalGap + 50));
 
+        this.setLocationRelativeTo(parent);
         this.setResizable(false);
         this.pack();
         this.setVisible(true);
