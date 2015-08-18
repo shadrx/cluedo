@@ -20,8 +20,8 @@ public class CluedoGUIController implements CluedoInterface {
     private final Object _syncObject = new Object();
 
     private Set<Location<Integer>> _blockedLocations = null;
-    private Map<Location, Location<Integer>[]> _pathsForTurn = new HashMap<>();
-    private Location<Integer>[] _selectedPath = null;
+    private Map<Location, Board.Path> _pathsForTurn = new HashMap<>();
+    private Board.Path _selectedPath = null;
     private Set<TurnOption> _possibleOptionsForTurn = Collections.emptySet();
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
 
@@ -189,13 +189,13 @@ public class CluedoGUIController implements CluedoInterface {
 
         //Show the player the accessible tiles if moving is a possible option
 
-        Set<Location<Integer>[]> possibleMoves;
+        Set<Board.Path> possibleMoves;
         if (possibleOptions.contains(TurnOption.Move)) {
             possibleMoves = _gameState.board.pathsFromLocation(player.location(), remainingMoves, _blockedLocations);
 
             _pathsForTurn.clear();
-            for (Location<Integer>[] path : possibleMoves) {
-                _pathsForTurn.put(path[path.length - 1], path);
+            for (Board.Path path : possibleMoves) {
+                _pathsForTurn.put(path.locations[path.locations.length - 1], path);
             }
         } else {
             possibleMoves = null;
@@ -222,7 +222,7 @@ public class CluedoGUIController implements CluedoInterface {
 
         List<Direction> move = _gameState.board.pathToDirections(_selectedPath);
 
-        SwingUtilities.invokeLater(() -> _cluedoFrame.diceView().setRemainingValue(distance - move.size()));
+        SwingUtilities.invokeLater(() -> _cluedoFrame.diceView().setRemainingValue(distance - _selectedPath.cost));
 
         _cluedoFrame.canvas().setLastPlayerMove(move, player);
 

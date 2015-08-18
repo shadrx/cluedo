@@ -123,10 +123,21 @@ public class Board {
 
     private class DijkstraNode {
         public int distanceFromSource = Integer.MAX_VALUE;
+        public int cost = Integer.MAX_VALUE;
         public Optional<Location<Integer>> previousLocation = Optional.empty();
     }
 
-    private Location<Integer>[] reconstructPath(Location<Integer> endLocation, DijkstraNode[][] nodeData, int distance) {
+    public class Path {
+        public final Location<Integer>[] locations;
+        public final int cost;
+
+        public Path(Location<Integer>[] locations, int cost) {
+            this.locations = locations;
+            this.cost = cost;
+        }
+    }
+
+    private Path reconstructPath(Location<Integer> endLocation, DijkstraNode[][] nodeData, int distance, int cost) {
         @SuppressWarnings("unchecked")
         Location<Integer>[] path = new Location[distance + 1];
 
@@ -137,11 +148,11 @@ public class Board {
             location = nodeData[location.x][location.y].previousLocation.orElse(null);
         }
 
-        return path;
+        return new Path(path, cost);
     }
 
-    public Set<Location<Integer>[]> pathsFromLocation(Location<Integer> location, int maxDistance, Set<Location<Integer>> blockedLocations) {
-        Set<Location<Integer>[]> paths = new HashSet<>();
+    public Set<Path> pathsFromLocation(Location<Integer> location, int maxCost, Set<Location<Integer>> blockedLocations) {
+        Set<Path> paths = new HashSet<>();
 
         DijkstraNode[][] nodeData = new DijkstraNode[this.width][this.height];
         for (DijkstraNode[] column : nodeData) {
@@ -151,6 +162,7 @@ public class Board {
         }
 
         nodeData[location.x][location.y].distanceFromSource = 0;
+        nodeData[location.x][location.y].cost = 0;
 
         PriorityQueue<Location<Integer>> queue = new PriorityQueue<>(
                 (l1, l2) -> nodeData[l1.x][l1.y].distanceFromSource - nodeData[l2.x][l2.y].distanceFromSource
@@ -161,22 +173,31 @@ public class Board {
 
         while (!queue.isEmpty()) {
             Location<Integer> currentLocation = queue.poll();
+            Tile currentTile = this.tileAtLocation(currentLocation);
             for (Location<Integer> neighbour : this.tileAtLocation(currentLocation).adjacentLocations.values()) {
                 if (blockedLocations.contains(neighbour)) {
                     continue;
                 }
 
+                int cost = 1;
+                Tile neighbourTile = this.tileAtLocation(neighbour);
+                if (currentTile.room.isPresent() && neighbourTile.room.isPresent() && currentTile.room.get() == neighbourTile.room.get()) {
+                    cost = 0;
+                }
+
+                cost += nodeData[currentLocation.x][currentLocation.y].cost;
                 int distance = nodeData[currentLocation.x][currentLocation.y].distanceFromSource + 1;
 
-                if (distance > maxDistance) {
-                    return paths;
+                if (cost > maxCost) {
+                    break;
                 }
 
                 if (distance < nodeData[neighbour.x][neighbour.y].distanceFromSource) {
                     nodeData[neighbour.x][neighbour.y].distanceFromSource = distance;
+                    nodeData[neighbour.x][neighbour.y].cost = cost;
                     nodeData[neighbour.x][neighbour.y].previousLocation = Optional.of(currentLocation);
 
-                    paths.add(this.reconstructPath(neighbour, nodeData, distance));
+                    paths.add(this.reconstructPath(neighbour, nodeData, distance, cost));
 
                     queue.add(neighbour); //add the neighbour to the queue,
                 }
@@ -186,12 +207,12 @@ public class Board {
         return paths;
     }
 
-    public List<Direction> pathToDirections(Location<Integer>[] path) {
+    public List<Direction> pathToDirections(Path path) {
         List<Direction> directions = new ArrayList<>();
 
-        for (int i = 0; i < path.length - 1; i++) {
-            Location<Integer> from = path[i];
-            Location<Integer> to = path[i + 1];
+        for (int i = 0; i < path.locations.length - 1; i++) {
+            Location<Integer> from = path.locations[i];
+            Location<Integer> to = path.locations[i + 1];
             Tile fromTile = this.tileAtLocation(from);
             Direction direction = null;
             for (Map.Entry<Direction, Location<Integer>> entry : fromTile.adjacentLocations.entrySet()) {

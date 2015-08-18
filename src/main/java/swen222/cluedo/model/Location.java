@@ -45,6 +45,12 @@ public class Location<T extends Number> {
         return new Location<>(lerpedX, lerpedY);
     }
 
+    public static <T extends Number> double distance(Location<T> l1, Location<T> l2) {
+        double dx = l2.x.doubleValue() - l1.x.doubleValue();
+        double dy = l2.y.doubleValue() - l1.y.doubleValue();
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
