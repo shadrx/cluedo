@@ -2,7 +2,6 @@ package swen222.cluedo.model;
 
 import swen222.cluedo.model.card.Room;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -126,20 +125,25 @@ public class Board {
         public int distanceFromSource = Integer.MAX_VALUE;
         public int cost = Integer.MAX_VALUE;
         public Optional<Location<Integer>> previousLocation = Optional.empty();
-        public Optional<Room> roomPassedThrough = Optional.empty();
+        public Optional<Room> endRoom = Optional.empty();
     }
 
-    public class Path {
+    public static class Path {
         public final Location<Integer>[] locations;
         public final int cost;
+        public final int distance;
 
         public Path(Location<Integer>[] locations, int cost) {
             this.locations = locations;
+            this.distance = locations.length;
             this.cost = cost;
         }
     }
 
-    private Path reconstructPath(Location<Integer> endLocation, DijkstraNode[][] nodeData, int distance, int cost) {
+    private Path reconstructPath(Location<Integer> endLocation, DijkstraNode[][] nodeData, int distance) {
+
+
+        int cost = nodeData[endLocation.x][endLocation.y].cost;
         @SuppressWarnings("unchecked")
         Location<Integer>[] path = new Location[distance + 1];
 
@@ -153,6 +157,13 @@ public class Board {
         return new Path(path, cost);
     }
 
+    /**
+     * Computes, using Dijkstra's algorithm, a set of the possible paths that can be taken from a location at a given cost
+     * @param location The start location
+     * @param maxCost The maximum allowed cost
+     * @param blockedLocations Any un-pathable locations
+     * @return A set of the possible paths.
+     */
     public Set<Path> pathsFromLocation(Location<Integer> location, int maxCost, Set<Location<Integer>> blockedLocations) {
         Set<Path> paths = new HashSet<>();
 
@@ -177,24 +188,20 @@ public class Board {
         while (!queue.isEmpty()) {
             Location<Integer> currentLocation = queue.poll();
             Tile currentTile = this.tileAtLocation(currentLocation);
+            Optional<Room> endRoom = nodeData[currentLocation.x][currentLocation.y].endRoom;
 
-            if (currentTile.room.isPresent() && !currentTile.room.equals(startingRoom)) {
-                nodeData[currentLocation.x][currentLocation.y].roomPassedThrough = currentTile.room;
-            }
+            for (Location<Integer> neighbour : currentTile.adjacentLocations.values()) {
 
-            Optional<Room> roomPassedThrough = nodeData[currentLocation.x][currentLocation.y].roomPassedThrough;
-
-            for (Location<Integer> neighbour : this.tileAtLocation(currentLocation).adjacentLocations.values()) {
-
-                Tile neighbourTile = this.tileAtLocation(neighbour);
-
-                if (blockedLocations.contains(neighbour) || !neighbourTile.room.equals(roomPassedThrough) ) {
-                    continue;
+                if (blockedLocations.contains(neighbour)) {
+                    continue; //we can't continue along this path.
                 }
 
                 int cost = 1;
 
-                if (currentTile.room.isPresent() && neighbourTile.room.isPresent() && currentTile.room.get() == neighbourTile.room.get()) {
+                Tile neighbourTile = this.tileAtLocation(neighbour);
+                if (currentTile.room.isPresent() &&
+                        neighbourTile.room.isPresent() &&
+                        currentTile.room.get() == neighbourTile.room.get()) { //it's free to travel between tiles within the same room.
                     cost = 0;
                 }
 
@@ -202,16 +209,21 @@ public class Board {
                 int distance = nodeData[currentLocation.x][currentLocation.y].distanceFromSource + 1;
 
                 if (cost > maxCost) {
-                    break;
+                    continue;
                 }
 
                 if (distance < nodeData[neighbour.x][neighbour.y].distanceFromSource) {
                     nodeData[neighbour.x][neighbour.y].distanceFromSource = distance;
                     nodeData[neighbour.x][neighbour.y].cost = cost;
                     nodeData[neighbour.x][neighbour.y].previousLocation = Optional.of(currentLocation);
-                    nodeData[neighbour.x][neighbour.y].roomPassedThrough = roomPassedThrough;
+                    nodeData[neighbour.x][neighbour.y].endRoom = endRoom;
 
-                    paths.add(this.reconstructPath(neighbour, nodeData, distance, cost));
+                    if (neighbourTile.room.isPresent() && !neighbourTile.room.equals(startingRoom)) {
+                        nodeData[neighbour.x][neighbour.y].endRoom = neighbourTile.room;
+                        nodeData[neighbour.x][neighbour.y].cost = maxCost; //Maximum cost if we end in a room.
+                    }
+
+                    paths.add(this.reconstructPath(neighbour, nodeData, distance));
 
                     queue.add(neighbour); //add the neighbour to the queue,
                 }
@@ -239,6 +251,35 @@ public class Board {
             directions.add(direction);
         }
         return directions;
+    }
+
+    /**
+     * Converts a list of directions (i.e. from the ASCII interface) to a path.
+     * The path is assumed to have the same cost as the length of the list.
+     * @param startingLocation The location at which the path starts.
+     * @param directions The directions in which to travel.
+     * @param blockedLocations Any inaccessible locations.
+     * @return Either the path, if it's valid, or an empty optional, if the directions were not valid.
+     */
+    @SuppressWarnings("unchecked")
+    public Optional<Path> directionsToPath(Location<Integer> startingLocation, List<Direction> directions, Set<Location<Integer>> blockedLocations) {
+
+        List<Location<Integer>> locations = new ArrayList<>();
+
+        locations.add(startingLocation);
+
+        Location<Integer> location = startingLocation;
+        for (Direction direction : directions) {
+            location = this.tileAtLocation(location).adjacentLocations.get(direction);
+            if (location == null) {
+                return Optional.empty();
+            }
+            locations.add(location);
+        }
+
+        return Optional.of(
+                new Path(locations.toArray(new Location[locations.size()]),
+                        directions.size())); //We assume, for this, that
     }
 
     private Room roomForCharacter(char c) {

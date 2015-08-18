@@ -10,8 +10,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,7 +29,7 @@ public class GameCanvas extends JPanel {
 
     private Optional<TileSelectionDelegate> _tileSelectionDelegate;
 
-    private java.util.List<Location<Integer>> _lastPlayerMove = new ArrayList<>();
+    private Board.Path _lastPlayerMove = null;
     private CluedoCharacter _lastPlayerMoveCharacter = null;
     private double _moveSequencePosition = -1.f;
 
@@ -103,20 +101,12 @@ public class GameCanvas extends JPanel {
     }
 
     private boolean shouldPlayMoveSequence() {
-        return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1;
+        return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.distance - 1;
     }
 
-    public void setLastPlayerMove(List<Direction> move, Player player) {
-        _lastPlayerMove.clear();
+    public void setLastPlayerMove(Board.Path path, Player player) {
 
-        Location<Integer> previousLocation = player.location();
-        _lastPlayerMove.add(previousLocation);
-
-        for (Direction direction : move) {
-            Location<Integer> nextLocation = _gameState.board.tileAtLocation(previousLocation).adjacentLocations.get(direction); //Convert the list of directions to a list of locations.
-            _lastPlayerMove.add(nextLocation);
-            previousLocation = nextLocation;
-        }
+        _lastPlayerMove = path;
 
         _lastPlayerMoveCharacter = player.character;
         _moveSequencePosition = 0.f;
@@ -124,7 +114,7 @@ public class GameCanvas extends JPanel {
 
     private void update(int deltaTime) {
         double advanceMoveBy = deltaTime * TilesPerMillisecond;
-        _moveSequencePosition = Math.min(advanceMoveBy + _moveSequencePosition, _lastPlayerMove.size() - 1.f);
+        _moveSequencePosition = Math.min(advanceMoveBy + _moveSequencePosition, _lastPlayerMove.distance - 1.f);
     }
 
     private int round(double f) {
@@ -174,7 +164,7 @@ public class GameCanvas extends JPanel {
 
     private void drawAccessibleTilesOverlay(Graphics g, Set<Board.Path> paths, double startX, double startY, double tileSize) {
         for (Board.Path path : paths) {
-            Location<Integer> endTile = path.locations[path.locations.length - 1];
+            Location<Integer> endTile = path.locations[path.distance - 1];
 
             g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.cost/14.f));
 
@@ -303,8 +293,8 @@ public class GameCanvas extends JPanel {
                 int highIndex = (int)Math.ceil(_moveSequencePosition);
                 double lerpValue = _moveSequencePosition - lowIndex;
 
-                Location<Float> startLocation = this.centreForTileAtLocation(_lastPlayerMove.get(lowIndex), board, startX, startY, step);
-                Location<Float> endLocation = this.centreForTileAtLocation(_lastPlayerMove.get(highIndex), board, startX, startY, step);
+                Location<Float> startLocation = this.centreForTileAtLocation(_lastPlayerMove.locations[lowIndex], board, startX, startY, step);
+                Location<Float> endLocation = this.centreForTileAtLocation(_lastPlayerMove.locations[highIndex], board, startX, startY, step);
                 if (Location.distance(startLocation, endLocation) > step * 1.5) { //if the tiles aren't adjacent, allowing for some error.
                     drawTransparent = true;
                 }

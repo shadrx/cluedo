@@ -112,7 +112,7 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public void showGame(Game game, List<Player> playersInPlay) {
+    public void showGame(Game game, Set<Location<Integer>> blockedLocations) {
         Board board = game.board;
 
         char[][] buffer = new char[2 * (board.width + 1)][2 * (board.height + 1)];
@@ -179,7 +179,7 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public List<Direction> requestPlayerMove(Player player, int distance) {
+    public Board.Path requestPlayerMove(Player player, Board board, Set<Location<Integer>> blockedLocations, int distance) {
         this.out.printf("Enter a move of length %d.\n", distance);
         this.out.printf("Moves are in the format UDLR, where such a move would mean go up, then down, then left, then right.\n\n");
 
@@ -188,19 +188,21 @@ public class ASCIIInterface implements CluedoInterface {
         String charSequence = this.scanner.next();
 
         if (charSequence.length() != distance) {
-            return this.requestPlayerMove(player, distance);
+            return this.requestPlayerMove(player, board, blockedLocations, distance);
         }
 
         for (int i = 0; i < charSequence.length(); i++) {
             char c = charSequence.charAt(i);
             Direction dir = Direction.fromCharacter(c);
             if (dir == null) {
-                return this.requestPlayerMove(player, distance);
+                return this.requestPlayerMove(player, board, blockedLocations, distance);
             }
             moveSequence.add(dir);
         }
 
-        return moveSequence;
+        Optional<Board.Path> path = board.directionsToPath(player.location(), moveSequence, blockedLocations);
+
+        return path.isPresent() ? path.get() : this.requestPlayerMove(player, board, blockedLocations, distance);
     }
 
     @Override
