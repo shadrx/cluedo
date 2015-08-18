@@ -1,13 +1,8 @@
 package swen222.cluedo.gui;
 
-import swen222.cluedo.model.card.Card;
-import swen222.cluedo.model.card.CluedoCharacter;
-import swen222.cluedo.model.card.Room;
-import swen222.cluedo.model.card.Weapon;
-
 import javax.swing.*;
-import java.awt.*;
-import java.util.Arrays;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Collections;
 import java.util.Optional;
 

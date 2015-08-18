@@ -1,17 +1,14 @@
 package swen222.cluedo;
 
-import swen222.cluedo.gui.CluedoFrame;
 import swen222.cluedo.gui.CluedoGUIController;
-import swen222.cluedo.gui.PlayerSelectionDialog;
-import swen222.cluedo.gui.PlayerSuggestionDialog;
-import swen222.cluedo.model.*;
+import swen222.cluedo.model.Board;
+import swen222.cluedo.model.Game;
+import swen222.cluedo.model.Player;
+import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
-import swen222.cluedo.asciiinterface.ASCIIInterface;
-import swen222.cluedo.model.card.Room;
 import utilities.Pair;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;

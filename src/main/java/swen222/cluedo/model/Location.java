@@ -1,8 +1,6 @@
 package swen222.cluedo.model;
 
 
-import java.util.Objects;
-
 public class Location<T extends Number> {
     public final T x;
     public final T y;

@@ -7,7 +7,8 @@ import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import utilities.Pair;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import java.util.*;
 import java.util.stream.Collectors;
 

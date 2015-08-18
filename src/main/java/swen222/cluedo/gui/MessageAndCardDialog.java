@@ -3,7 +3,10 @@ package swen222.cluedo.gui;
 import swen222.cluedo.model.card.Card;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Insets;
 import java.util.List;
 import java.util.Optional;
 

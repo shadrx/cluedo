@@ -1,14 +1,11 @@
 package swen222.cluedo.model;
 
-import swen222.cluedo.model.card.Card;
-import swen222.cluedo.model.card.CluedoCharacter;
-import swen222.cluedo.model.card.Room;
 import swen222.cluedo.CluedoInterface;
-import swen222.cluedo.model.card.Weapon;
+import swen222.cluedo.model.card.Card;
+import swen222.cluedo.model.card.Room;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Game {
     public final Board board;

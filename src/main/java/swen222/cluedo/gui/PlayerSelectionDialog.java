@@ -1,16 +1,14 @@
 package swen222.cluedo.gui;
 
 import swen222.cluedo.model.Player;
-import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
 import utilities.SpringUtilities;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.util.Optional;
 import java.util.Set;
 

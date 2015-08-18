@@ -2,14 +2,10 @@ package swen222.cluedo.gui;
 
 import utilities.Pair;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.*;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.util.*;
-import java.util.List;
 
 /**
  * A view that displays the result of two six sided dice.

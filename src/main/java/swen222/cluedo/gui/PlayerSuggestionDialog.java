@@ -8,11 +8,12 @@ import swen222.cluedo.model.card.Weapon;
 import utilities.SpringUtilities;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public class PlayerSuggestionDialog extends JDialog {
 

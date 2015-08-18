@@ -4,10 +4,7 @@ import swen222.cluedo.model.card.Room;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class Board {
 

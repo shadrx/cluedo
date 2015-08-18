@@ -2,7 +2,7 @@ package swen222.cluedo.model.card;
 
 import swen222.cluedo.model.Location;
 
-import java.awt.*;
+import java.awt.Color;
 
 public enum CluedoCharacter implements Card {
     MissScarlet,

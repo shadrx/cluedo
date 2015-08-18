@@ -1,7 +1,9 @@
 package swen222.cluedo.gui;
 
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import java.util.Optional;
 
 /**
