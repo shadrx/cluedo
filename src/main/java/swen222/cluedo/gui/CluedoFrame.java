@@ -17,7 +17,7 @@ public class CluedoFrame extends JFrame {
     /**
      * A panel to contain components at the bottom of the frame.
      */
-    private JPanel bottomPanel;
+    private JPanel _bottomPanel;
 
     private CluedoActionView _actionView;
     private CardView _cardView;
@@ -42,22 +42,22 @@ public class CluedoFrame extends JFrame {
         _diceView = new DiceView(7);
 
         // setup the bottom panel
-        this.bottomPanel = new JPanel();
-        this.bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
-        this.bottomPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        this.bottomPanel.add(_diceView, BorderLayout.WEST);
-        this.bottomPanel.add(Box.createHorizontalStrut(10));
+        this._bottomPanel = new JPanel();
+        this._bottomPanel.setLayout(new BoxLayout(_bottomPanel, BoxLayout.LINE_AXIS));
+        this._bottomPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        this._bottomPanel.add(_diceView, BorderLayout.WEST);
+        this._bottomPanel.add(Box.createHorizontalStrut(10));
 
         JScrollPane cardScrollPane = new JScrollPane(_cardView, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         cardScrollPane.setOpaque(false);
         Dimension cardViewMaxSize = _cardView.getMaximumSize();
         cardScrollPane.setMaximumSize(new Dimension(cardViewMaxSize.width, Integer.MAX_VALUE));
 
-        this.bottomPanel.add(cardScrollPane, BorderLayout.CENTER);
-        this.bottomPanel.add(Box.createHorizontalStrut(10));
-        this.bottomPanel.add(_actionView, BorderLayout.EAST);
+        this._bottomPanel.add(cardScrollPane, BorderLayout.CENTER);
+        this._bottomPanel.add(Box.createHorizontalStrut(10));
+        this._bottomPanel.add(_actionView, BorderLayout.EAST);
 
-        this.add(bottomPanel, BorderLayout.SOUTH);
+        this.add(_bottomPanel, BorderLayout.SOUTH);
 
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.pack();
