@@ -19,6 +19,8 @@ public class CluedoFrame extends JFrame {
      */
     private JPanel _bottomPanel;
 
+    private CluedoMenuBar _cluedoMenuBar;
+
     private CluedoActionView _actionView;
     private CardView _cardView;
     private DiceView _diceView;
@@ -32,6 +34,10 @@ public class CluedoFrame extends JFrame {
     private void createAndShowGUI() {
         // setup the game canvas that draw the board
         this.setLayout(new BorderLayout());
+
+        _cluedoMenuBar = new CluedoMenuBar();
+        this.add(_cluedoMenuBar, BorderLayout.NORTH);
+
         _canvas = new GameCanvas();
         this.add(_canvas, BorderLayout.CENTER);
 
