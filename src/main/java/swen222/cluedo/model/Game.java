@@ -172,7 +172,7 @@ public class Game {
                             if (this.checkForSuggestion(player, tile.room.get())) {
                                 possibleActions.remove(TurnOption.Move);
                                 possibleActions.remove(TurnOption.Suggestion);
-                                canMakeSuggestion = false;Dr
+                                canMakeSuggestion = false;
                             }
                             break;
                         case EndTurn:
