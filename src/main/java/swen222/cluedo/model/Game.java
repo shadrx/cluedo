@@ -124,7 +124,7 @@ public class Game {
         while (!newLocation.isPresent()) {
             List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, distance);
             Set<Location<Integer>> otherPlayerLocations = players.stream()
-                    .filter(player1 -> player1 != player)
+                    .filter(player1 -> player1 != player && !this.board.tileAtLocation(player1.location()).room.isPresent())
                     .map(Player::location)
                     .collect(Collectors.toSet());
             newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);

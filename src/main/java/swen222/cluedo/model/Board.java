@@ -2,6 +2,7 @@ package swen222.cluedo.model;
 
 import swen222.cluedo.model.card.Room;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -125,6 +126,7 @@ public class Board {
         public int distanceFromSource = Integer.MAX_VALUE;
         public int cost = Integer.MAX_VALUE;
         public Optional<Location<Integer>> previousLocation = Optional.empty();
+        public Optional<Room> roomPassedThrough = Optional.empty();
     }
 
     public class Path {
@@ -170,17 +172,28 @@ public class Board {
 
         queue.add(location);
 
+        Optional<Room> startingRoom = this.tileAtLocation(location).room;
 
         while (!queue.isEmpty()) {
             Location<Integer> currentLocation = queue.poll();
             Tile currentTile = this.tileAtLocation(currentLocation);
+
+            if (currentTile.room.isPresent() && !currentTile.room.equals(startingRoom)) {
+                nodeData[currentLocation.x][currentLocation.y].roomPassedThrough = currentTile.room;
+            }
+
+            Optional<Room> roomPassedThrough = nodeData[currentLocation.x][currentLocation.y].roomPassedThrough;
+
             for (Location<Integer> neighbour : this.tileAtLocation(currentLocation).adjacentLocations.values()) {
-                if (blockedLocations.contains(neighbour)) {
+
+                Tile neighbourTile = this.tileAtLocation(neighbour);
+
+                if (blockedLocations.contains(neighbour) || !neighbourTile.room.equals(roomPassedThrough) ) {
                     continue;
                 }
 
                 int cost = 1;
-                Tile neighbourTile = this.tileAtLocation(neighbour);
+
                 if (currentTile.room.isPresent() && neighbourTile.room.isPresent() && currentTile.room.get() == neighbourTile.room.get()) {
                     cost = 0;
                 }
@@ -196,6 +209,7 @@ public class Board {
                     nodeData[neighbour.x][neighbour.y].distanceFromSource = distance;
                     nodeData[neighbour.x][neighbour.y].cost = cost;
                     nodeData[neighbour.x][neighbour.y].previousLocation = Optional.of(currentLocation);
+                    nodeData[neighbour.x][neighbour.y].roomPassedThrough = roomPassedThrough;
 
                     paths.add(this.reconstructPath(neighbour, nodeData, distance, cost));
 
