@@ -1,6 +1,10 @@
 package swen222.cluedo.gui;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Arrays;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.Collections;
@@ -46,7 +50,7 @@ public class CluedoFrame extends JFrame {
         this._bottomPanel = new JPanel();
         this._bottomPanel.setLayout(new BoxLayout(_bottomPanel, BoxLayout.LINE_AXIS));
         this._bottomPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        this._bottomPanel.add(_diceView, BorderLayout.WEST);
+        this._bottomPanel.add(_diceView);
         this._bottomPanel.add(Box.createHorizontalStrut(10));
 
         JScrollPane cardScrollPane = new JScrollPane(_cardView, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -60,7 +64,19 @@ public class CluedoFrame extends JFrame {
 
         this.add(_bottomPanel, BorderLayout.SOUTH);
 
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int reply = JOptionPane.showConfirmDialog(null,
+                        "Are you sure you want to quit?", "Quit", JOptionPane.YES_NO_OPTION);
+                if (reply == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
+            }
+        });
+
         this.pack();
         this.setResizable(true);
         this.setVisible(true);

@@ -232,6 +232,13 @@ public class GameCanvas extends JPanel {
                 if (hasRoom || isUnaccessibleSpace) {
                     g.setColor(hasRoom ? Color.lightGray : Color.cyan);
                     g.fillRect(round(x * step + startX - 0.5), round(y * step + startY - 0.5), round(step + 1), round(step + 1));
+
+                    if (tile.isPassageway(board)) {
+                        g.setColor(Color.darkGray);
+                        for (int i = 0; i < step; i += 2) {
+                            g.fillRect(round(x * step + startX - 0.5), round(y * step + startY - 0.5 + i), round(step + 1), 1);
+                        }
+                    }
                 }
 
                 y++;

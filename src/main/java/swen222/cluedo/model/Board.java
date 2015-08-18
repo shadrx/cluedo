@@ -331,5 +331,17 @@ public class Board {
             this.room = room;
             this.adjacentLocations = adjacentLocations;
         }
+
+        public boolean isPassageway(Board board) {
+            for (Map.Entry<Direction, Location<Integer>> entry : this.adjacentLocations.entrySet()) {
+                Direction direction = entry.getKey();
+                Location<Integer> location = entry.getValue();
+                Tile otherTile = board.tileAtLocation(location);
+                if (this.room.isPresent() && otherTile.room.isPresent() && !otherTile.room.get().equals(this.room.get())) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

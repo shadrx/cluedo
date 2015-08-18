@@ -146,6 +146,8 @@ public class Game {
                 int diceRoll = (int) (Math.floor(Math.random() * 11) + 2);
                 int remaining = diceRoll;
 
+                boolean canMakeSuggestion = true;
+
                 player.cluedoInterface.notifyStartOfTurn(player, diceRoll);
 
                 EnumSet<TurnOption> possibleActions = EnumSet.of(TurnOption.EndTurn, TurnOption.Move, TurnOption.Accusation);
@@ -156,7 +158,7 @@ public class Game {
 
                     Board.Tile tile = this.board.tileAtLocation(player.location());
 
-                    if (tile.room.isPresent()) {
+                    if (tile.room.isPresent() && canMakeSuggestion) {
                         possibleActions.add(TurnOption.Suggestion);
                     }
 
@@ -170,6 +172,7 @@ public class Game {
                             if (this.checkForSuggestion(player, tile.room.get())) {
                                 possibleActions.remove(TurnOption.Move);
                                 possibleActions.remove(TurnOption.Suggestion);
+                                canMakeSuggestion = false;Dr
                             }
                             break;
                         case EndTurn:
