@@ -59,9 +59,9 @@ public interface CluedoInterface {
      * a text-based implementation might print an ASCII map; a GUI based application would update its GUI.
      *
      * @param game The current game.
-     * @param playersInPlay The players currently playing the game.
+     * @param blockedLocations The currently inaccessible locations on the board.
      */
-    void showGame(Game game, List<Player> playersInPlay);
+    void showGame(Game game, Set<Location<Integer>> blockedLocations);
 
     /**
      * Ask the player what action they want to take for their turn.
@@ -74,12 +74,15 @@ public interface CluedoInterface {
 
     /**
      * Request a movement on the board that is exactly the given distance.
+     * The interface guarantees that the move is valid.
      *
      * @param player the player to move
+     * @param board The game board.
+     * @param blockedLocations Any blocked locations that cannot be travelled through.
      * @param distance the distance the move must be
      * @return a sequence of directions making up the move
      */
-    List<Direction> requestPlayerMove(Player player, int distance);
+    Board.Path requestPlayerMove(Player player, Board board, Set<Location<Integer>> blockedLocations, int distance);
 
 
     /**

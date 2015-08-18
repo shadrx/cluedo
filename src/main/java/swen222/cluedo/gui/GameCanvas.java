@@ -10,8 +10,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,11 +29,11 @@ public class GameCanvas extends JPanel {
 
     private Optional<TileSelectionDelegate> _tileSelectionDelegate;
 
-    private java.util.List<Location<Integer>> _lastPlayerMove = new ArrayList<>();
+    private Board.Path _lastPlayerMove = null;
     private CluedoCharacter _lastPlayerMoveCharacter = null;
     private double _moveSequencePosition = -1.f;
 
-    private Set<Location<Integer>[]> _accessibleTilePaths = null;
+    private Set<Board.Path> _accessibleTilePaths = null;
 
     public GameCanvas() {
         super(true);
@@ -97,26 +95,18 @@ public class GameCanvas extends JPanel {
         this.repaint();
     }
 
-    public void setAccessibleTilePaths(Set<Location<Integer>[]> paths) {
+    public void setAccessibleTilePaths(Set<Board.Path> paths) {
         _accessibleTilePaths = paths;
         this.repaint();
     }
 
     private boolean shouldPlayMoveSequence() {
-        return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.size() - 1;
+        return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.distance - 1;
     }
 
-    public void setLastPlayerMove(List<Direction> move, Player player) {
-        _lastPlayerMove.clear();
+    public void setLastPlayerMove(Board.Path path, Player player) {
 
-        Location<Integer> previousLocation = player.location();
-        _lastPlayerMove.add(previousLocation);
-
-        for (Direction direction : move) {
-            Location<Integer> nextLocation = previousLocation.locationInDirection(direction); //Convert the list of directions to a list of locations.
-            _lastPlayerMove.add(nextLocation);
-            previousLocation = nextLocation;
-        }
+        _lastPlayerMove = path;
 
         _lastPlayerMoveCharacter = player.character;
         _moveSequencePosition = 0.f;
@@ -124,7 +114,7 @@ public class GameCanvas extends JPanel {
 
     private void update(int deltaTime) {
         double advanceMoveBy = deltaTime * TilesPerMillisecond;
-        _moveSequencePosition = Math.min(advanceMoveBy + _moveSequencePosition, _lastPlayerMove.size() - 1.f);
+        _moveSequencePosition = Math.min(advanceMoveBy + _moveSequencePosition, _lastPlayerMove.distance - 1.f);
     }
 
     private int round(double f) {
@@ -157,7 +147,7 @@ public class GameCanvas extends JPanel {
         return new Location<>((float)(startX + tileSize * location.x + tileCentreX),(float)(startY + tileSize * location.y + tileCentreY));
     }
 
-    private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, double step) {
+    private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, double step, boolean drawTransparent) {
 
         //TODO these are not correctly centered and sometimes lack borders.
 
@@ -165,18 +155,18 @@ public class GameCanvas extends JPanel {
 
         final double characterBorderRatio = 1.2f;
 
-        g.setColor(Color.black);
+        g.setColor(new Color(0.f, 0.f, 0.f, drawTransparent ? 0.2f : 1.f));
         g.fillOval(round(location.x - diameter * characterBorderRatio / 2), round(location.y - diameter * characterBorderRatio / 2), round(diameter * characterBorderRatio), round(diameter * characterBorderRatio));
 
-        g.setColor(character.colour());
+        g.setColor(new Color(character.colour().getRed(), character.colour().getGreen(), character.colour().getBlue(), drawTransparent ? 50 : 255));
         g.fillOval(round(location.x - diameter/2), round(location.y - diameter/2), round(diameter), round(diameter));
     }
 
-    private void drawAccessibleTilesOverlay(Graphics g, Set<Location<Integer>[]> paths, double startX, double startY, double tileSize) {
-        for (Location<Integer>[] path : paths) {
-            Location<Integer> endTile = path[path.length - 1];
+    private void drawAccessibleTilesOverlay(Graphics g, Set<Board.Path> paths, double startX, double startY, double tileSize) {
+        for (Board.Path path : paths) {
+            Location<Integer> endTile = path.locations[path.distance - 1];
 
-            g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.length/14.f));
+            g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.cost/14.f));
 
             g.fillRect(round(startX + tileSize * endTile.x), round(startY + tileSize * endTile.y), round(tileSize), round(tileSize));
         }
@@ -294,6 +284,7 @@ public class GameCanvas extends JPanel {
 
         boolean shouldPlayMoveSequence = this.shouldPlayMoveSequence();
         for (Player player : _gameState.allPlayers) {
+            boolean drawTransparent = false;
             Location<Float> playerLocation;
             if (shouldPlayMoveSequence && //We haven't finished animating the move
                     player.character == _lastPlayerMoveCharacter) { //The move is for this character
@@ -302,15 +293,17 @@ public class GameCanvas extends JPanel {
                 int highIndex = (int)Math.ceil(_moveSequencePosition);
                 double lerpValue = _moveSequencePosition - lowIndex;
 
-                Location<Float> startLocation = this.centreForTileAtLocation(_lastPlayerMove.get(lowIndex), board, startX, startY, step);
-                Location<Float> endLocation = this.centreForTileAtLocation(_lastPlayerMove.get(highIndex), board, startX, startY, step);
+                Location<Float> startLocation = this.centreForTileAtLocation(_lastPlayerMove.locations[lowIndex], board, startX, startY, step);
+                Location<Float> endLocation = this.centreForTileAtLocation(_lastPlayerMove.locations[highIndex], board, startX, startY, step);
+                if (Location.distance(startLocation, endLocation) > step * 1.5) { //if the tiles aren't adjacent, allowing for some error.
+                    drawTransparent = true;
+                }
                 playerLocation = Location.lerp(startLocation, endLocation, (float)lerpValue);
-
             } else {
                 playerLocation = this.centreForTileAtLocation(player.location(), board, startX, startY, step);
             }
 
-            this.drawPlayer(g, playerLocation, player.character, step);
+            this.drawPlayer(g, playerLocation, player.character, step, drawTransparent);
 
         }
 

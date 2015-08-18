@@ -118,19 +118,12 @@ public class Game {
     }
 
     /** Returns the remaining number of moves possible. */
-    private int performMoveForPlayer(Player player, List<Player> players, int distance) {
-        int remaining = distance;
-        Optional<Location<Integer>> newLocation = Optional.empty();
-        while (!newLocation.isPresent()) {
-            List<Direction> moveSequence = player.cluedoInterface.requestPlayerMove(player, distance);
-            Set<Location<Integer>> otherPlayerLocations = players.stream()
-                    .filter(player1 -> player1 != player)
-                    .map(Player::location)
-                    .collect(Collectors.toSet());
-            newLocation = this.board.newLocationForMove(moveSequence, player.location(), otherPlayerLocations);
-            remaining = distance - moveSequence.size();
-        }
-        player.setLocation(newLocation.get());
+    private int performMoveForPlayer(Player player, List<Player> players, Set<Location<Integer>> blockedLocations, int distance) {
+
+        Board.Path moveSequence = player.cluedoInterface.requestPlayerMove(player, this.board, blockedLocations, distance);
+        Location<Integer> newLocation = moveSequence.locations[moveSequence.distance - 1];
+        int remaining = distance - moveSequence.cost;
+        player.setLocation(newLocation);
         return remaining;
     }
 
@@ -152,7 +145,13 @@ public class Game {
 
                 EnumSet<TurnOption> possibleActions = EnumSet.of(TurnOption.EndTurn, TurnOption.Move, TurnOption.Accusation);
 
-                player.cluedoInterface.showGame(this, players);
+                Set<Location<Integer>> blockedLocations = players.stream()
+                        .filter(player1 -> player1 != player &&
+                                !this.board.tileAtLocation(player1.location()).room.isPresent())
+                        .map(Player::location)
+                        .collect(Collectors.toSet());
+
+                player.cluedoInterface.showGame(this, blockedLocations);
 
                 while (!possibleActions.isEmpty()) {
 
@@ -179,7 +178,7 @@ public class Game {
                             possibleActions.clear();
                             break;
                         case Move:
-                            remaining = this.performMoveForPlayer(player, players, remaining);
+                            remaining = this.performMoveForPlayer(player, players, blockedLocations, remaining);
                             if (remaining == 0) {
                                 possibleActions.remove(TurnOption.Move);
                             }

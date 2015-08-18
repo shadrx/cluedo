@@ -19,9 +19,10 @@ public class CluedoGUIController implements CluedoInterface {
     private CluedoFrame _cluedoFrame = null;
     private final Object _syncObject = new Object();
 
+    private Player _currentPlayer = null;
     private Set<Location<Integer>> _blockedLocations = null;
-    private Map<Location, Location<Integer>[]> _pathsForTurn = new HashMap<>();
-    private Location<Integer>[] _selectedPath = null;
+    private Map<Location, Board.Path> _pathsForTurn = new HashMap<>();
+    private Board.Path _selectedPath = null;
     private Set<TurnOption> _possibleOptionsForTurn = Collections.emptySet();
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
 
@@ -76,10 +77,11 @@ public class CluedoGUIController implements CluedoInterface {
                     });
 
                     _cluedoFrame.canvas().setDelegate((location) -> {
-                        if (_possibleOptionsForTurn.contains(TurnOption.Move)) {
+                        Board.Path path = _pathsForTurn.get(location);
+                        if (_possibleOptionsForTurn.contains(TurnOption.Move) && path != null) {
                             _playerOptionForTurn = Optional.of(TurnOption.Move);
 
-                            _selectedPath = _pathsForTurn.get(location);
+                            _selectedPath = path;
                             resumeGameThread();
                         }
 
@@ -131,10 +133,13 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public void notifyStartOfTurn(Player player, int diceRoll) {
+        _currentPlayer = player;
 
         SwingUtilities.invokeLater(() -> {
 
             this.setupGUI();
+
+            _cluedoFrame.cardView().setCards(Collections.emptyList());
 
             JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s's (%s) Turn", player.name.get(), player.character));
 
@@ -172,10 +177,10 @@ public class CluedoGUIController implements CluedoInterface {
     }
 
     @Override
-    public void showGame(Game game, List<Player> playersInPlay) {
+    public void showGame(Game game, Set<Location<Integer>> blockedLocations) {
         _gameState = game;
 
-        _blockedLocations = playersInPlay.stream().map(Player::location).collect(Collectors.toSet());
+        _blockedLocations = blockedLocations;
         SwingUtilities.invokeLater(() -> {
             _cluedoFrame.canvas().setGameState(game);
             _cluedoFrame.canvas().setAccessibleTilePaths(null);
@@ -189,13 +194,13 @@ public class CluedoGUIController implements CluedoInterface {
 
         //Show the player the accessible tiles if moving is a possible option
 
-        Set<Location<Integer>[]> possibleMoves;
+        Set<Board.Path> possibleMoves;
         if (possibleOptions.contains(TurnOption.Move)) {
             possibleMoves = _gameState.board.pathsFromLocation(player.location(), remainingMoves, _blockedLocations);
 
             _pathsForTurn.clear();
-            for (Location<Integer>[] path : possibleMoves) {
-                _pathsForTurn.put(path[path.length - 1], path);
+            for (Board.Path path : possibleMoves) {
+                _pathsForTurn.put(path.locations[path.distance - 1], path);
             }
         } else {
             possibleMoves = null;
@@ -213,20 +218,19 @@ public class CluedoGUIController implements CluedoInterface {
         return _playerOptionForTurn.get();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Direction> requestPlayerMove(Player player, int distance) {
+    public Board.Path requestPlayerMove(Player player, Board board, Set<Location<Integer>> blockedLocations, int distance) {
 
         if (distance == 0 || _selectedPath == null) {
-            return Collections.emptyList();
+            new Board.Path(new Location[]{player.location()}, 0);
         }
 
-        List<Direction> move = _gameState.board.pathToDirections(_selectedPath);
+        SwingUtilities.invokeLater(() -> _cluedoFrame.diceView().setRemainingValue(distance - _selectedPath.cost));
 
-        SwingUtilities.invokeLater(() -> _cluedoFrame.diceView().setRemainingValue(distance - move.size()));
+        _cluedoFrame.canvas().setLastPlayerMove(_selectedPath, player);
 
-        _cluedoFrame.canvas().setLastPlayerMove(move, player);
-
-        return move;
+        return _selectedPath;
     }
 
     private Optional<Suggestion> getPlayerSuggestion(Player player, Optional<Room> room) {
