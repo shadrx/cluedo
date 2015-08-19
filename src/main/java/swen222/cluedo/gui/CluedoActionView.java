@@ -1,21 +1,18 @@
 package swen222.cluedo.gui;
 
 
+import swen222.cluedo.model.TurnOption;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A view that holds buttons that trigger actions within the game. 
  */
 public class CluedoActionView extends JComponent {
-
-    public interface ActionDelegate {
-        void makeAnAccusation();
-        void makeASuggestion();
-        void endTurn();
-    }
 
     public final JButton suggestionButton = new JButton("Make a Suggestion");
     public final JButton accusationButton = new JButton("Make an Accusation");
@@ -57,5 +54,11 @@ public class CluedoActionView extends JComponent {
 
     public void setDelegate(ActionDelegate delegate) {
         _delegate = Optional.ofNullable(delegate);
+    }
+
+    public void setEnabledActions(Set<TurnOption> actions) {
+        this.accusationButton.setEnabled(actions.contains(TurnOption.Accusation));
+        this.suggestionButton.setEnabled(actions.contains(TurnOption.Suggestion));
+        this.endTurnButton.setEnabled(actions.contains(TurnOption.EndTurn));
     }
 }

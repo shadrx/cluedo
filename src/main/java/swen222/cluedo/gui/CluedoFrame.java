@@ -1,5 +1,7 @@
 package swen222.cluedo.gui;
 
+import swen222.cluedo.model.TurnOption;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -9,6 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 public class CluedoFrame extends JFrame {
 
@@ -28,6 +31,16 @@ public class CluedoFrame extends JFrame {
     public CluedoFrame() {
         super("Cluedo");
         this.createAndShowGUI();
+    }
+
+    public void setActionDelegate(ActionDelegate delegate) {
+        _actionView.setDelegate(delegate);
+        _cluedoMenuBar.setDelegate(delegate);
+    }
+
+    public void setEnabledActions(Set<TurnOption> actions) {
+        _actionView.setEnabledActions(actions);
+        _cluedoMenuBar.setEnabledActions(actions);
     }
 
     private void createAndShowGUI() {

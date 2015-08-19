@@ -53,8 +53,13 @@ public class CluedoGUIController implements CluedoInterface {
 
     private void setupGUI() {
                 if (_cluedoFrame == null) {
+
+                    System.setProperty("apple.laf.useScreenMenuBar", "true");
+                    System.setProperty(
+                            "com.apple.mrj.application.apple.menu.about.name", "Name"); //use the OS X menu bar.
+
                     _cluedoFrame = new CluedoFrame();
-                    _cluedoFrame.actionView().setDelegate(new CluedoActionView.ActionDelegate() {
+                    _cluedoFrame.setActionDelegate(new ActionDelegate() {
                         @Override
                         public void makeASuggestion() {
                             _playerOptionForTurn = Optional.of(TurnOption.Suggestion);
@@ -72,7 +77,6 @@ public class CluedoGUIController implements CluedoInterface {
                             _playerOptionForTurn = Optional.of(TurnOption.Accusation);
                             resumeGameThread();
                         }
-
 
                     });
 
@@ -209,9 +213,7 @@ public class CluedoGUIController implements CluedoInterface {
         SwingUtilities.invokeLater(() -> {
             _cluedoFrame.canvas().setAccessibleTilePaths(possibleMoves);
 
-            _cluedoFrame.actionView().accusationButton.setEnabled(possibleOptions.contains(TurnOption.Accusation));
-            _cluedoFrame.actionView().suggestionButton.setEnabled(possibleOptions.contains(TurnOption.Suggestion));
-            _cluedoFrame.actionView().endTurnButton.setEnabled(possibleOptions.contains(TurnOption.EndTurn));
+            _cluedoFrame.setEnabledActions(possibleOptions);
         });
 
         waitForGUI();
