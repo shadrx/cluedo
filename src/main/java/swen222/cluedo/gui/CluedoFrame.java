@@ -6,15 +6,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Arrays;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * CluedoFrame is the root view in the MVC paradigm. It provides access to its child components and
+ * convenience methods to modify their action delegates and enabled actions.
+ * When instantiated, it will automatically display itself.
+ */
 public class CluedoFrame extends JFrame {
-
 
     /**
      * A panel to contain components at the bottom of the frame.
@@ -33,11 +34,21 @@ public class CluedoFrame extends JFrame {
         this.createAndShowGUI();
     }
 
+    /**
+     * Sets the action delegate for the child action view and menu bar.
+     *
+     * @param delegate The delegate to set. Null is a valid value.
+     */
     public void setActionDelegate(ActionDelegate delegate) {
         _actionView.setDelegate(delegate);
         _cluedoMenuBar.setDelegate(delegate);
     }
 
+    /**
+     * Restricts the actions that can be performed by the action view and menu bar to those specified in actions.
+     *
+     * @param actions The set of all possible actions at this time.
+     */
     public void setEnabledActions(Set<TurnOption> actions) {
         _actionView.setEnabledActions(actions);
         _cluedoMenuBar.setEnabledActions(actions);
@@ -57,7 +68,7 @@ public class CluedoFrame extends JFrame {
 
         // add card view
         _cardView = new CardView(Collections.emptyList(), Optional.empty());
-        _diceView = new DiceView(7);
+        _diceView = new DiceView(0);
 
         // setup the bottom panel
         this._bottomPanel = new JPanel();
@@ -94,6 +105,8 @@ public class CluedoFrame extends JFrame {
         this.setResizable(true);
         this.setVisible(true);
     }
+
+    //Public getters.
 
     public CardView cardView() {
         return _cardView;

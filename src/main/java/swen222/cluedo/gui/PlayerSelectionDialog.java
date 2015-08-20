@@ -7,24 +7,23 @@ import utilities.SpringUtilities;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * PlayerSelectionDialog is a self-displaying dialog used for determining a player's name and character.
+ * It has an optional delegate to be notified of the result.
+ * It can only be dismissed when a valid name (e.g. of non-zero length) has been entered and a character has been selected.
+ */
 public class PlayerSelectionDialog extends JDialog {
 
-    public interface PlayerSelectionDelegate {
-        void playerSelectionDialogDidCreatePlayer(PlayerSelectionDialog dialog, String name, CluedoCharacter character);
-    }
+    private final Optional<PlayerSelectionDelegate> _delegate;
 
     //Adapted from http://docs.oracle.com/javase/tutorial/uiswing/examples/layout/SpringDemo4Project/src/layout/SpringDemo4.java
-
-    private final Optional<PlayerSelectionDelegate> _delegate;
     private String _playerName;
     private CluedoCharacter _selectedCharacter;
     private Player _player;
-
     public PlayerSelectionDialog(PlayerSelectionDelegate delegate, Set<CluedoCharacter> availableCharacters) {
         super((JFrame)null, "Create a New Player");
         _delegate = Optional.ofNullable(delegate);
@@ -105,5 +104,9 @@ public class PlayerSelectionDialog extends JDialog {
         this.pack();
         this.setLocationRelativeTo(null); //center on the screen.
         this.setVisible(true);
+    }
+
+    public interface PlayerSelectionDelegate {
+        void playerSelectionDialogDidCreatePlayer(PlayerSelectionDialog dialog, String name, CluedoCharacter character);
     }
 }

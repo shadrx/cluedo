@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * CluedoMenuBar represents a menu bar object for the CluedoFrame window.
+ * It can perform the actions specified by TurnOption, and also quit the application.
+ */
 public class CluedoMenuBar extends JMenuBar {
 
     private Optional<ActionDelegate> _delegate;

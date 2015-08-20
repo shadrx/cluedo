@@ -3,14 +3,13 @@ package swen222.cluedo.gui;
 
 import swen222.cluedo.model.TurnOption;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
+import javax.swing.*;
 import java.util.Optional;
 import java.util.Set;
 
 /**
- * A view that holds buttons that trigger actions within the game. 
+ * A view that holds buttons that trigger actions within the game.
+ * It has an optional ActionDelegate property which allows the controller to respond to the events.
  */
 public class CluedoActionView extends JComponent {
 
@@ -56,6 +55,11 @@ public class CluedoActionView extends JComponent {
         _delegate = Optional.ofNullable(delegate);
     }
 
+    /**
+     * setEnabledActions modifies the enabled properties of this view's buttons so that only the actions contained in 'actions' can be performed.
+     *
+     * @param actions The set of the possible actions at this time.
+     */
     public void setEnabledActions(Set<TurnOption> actions) {
         this.accusationButton.setEnabled(actions.contains(TurnOption.Accusation));
         this.suggestionButton.setEnabled(actions.contains(TurnOption.Suggestion));

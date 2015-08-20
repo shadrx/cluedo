@@ -2,33 +2,32 @@ package swen222.cluedo.gui;
 
 import swen222.cluedo.model.card.Card;
 
-import javax.swing.JPanel;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * CardView is a component that is used to display different Card instances.
+ * The cards can be modified without reinstantiating the view.
+ * Its size is locked to the size of its cards.
+ * Often, it makes sense to embed this component within a JScrollPane (as in the CluedoFrame).
+ * Optionally, it can notify a delegate when one of its cards is clicked.
+ */
 public class CardView extends JPanel implements MouseListener {
-
-    public interface CardListener {
-        void cardViewDidSelectCard(CardView cardView, Card card);
-    }
 
     private static final int CardMargin = 20;
     private static final int PreferredHeight = 220;
     private static final long MinimumWidth = (long)(0.6 * PreferredHeight); //width is 0.6 times the height
-
     private List<Card> _cards;
     private List<Image> _cardImages;
     private Integer[] _imageXs;
+    private Optional<CardSelectionDelegate> _cardListener = Optional.empty();
 
-    private Optional<CardListener> _cardListener = Optional.empty();
-
-    public CardView(List<Card> cards, Optional<CardListener> cardListener) {
+    public CardView(List<Card> cards, Optional<CardSelectionDelegate> cardListener) {
         this.setCards(cards);
 
         _cardListener = cardListener;
@@ -72,19 +71,19 @@ public class CardView extends JPanel implements MouseListener {
 
         long constrainedWidth = Math.max(width, MinimumWidth); //Set a minimum width if there are no cards.
 
-        return new Dimension((int)constrainedWidth, PreferredHeight);
+        return new Dimension((int) constrainedWidth, PreferredHeight);
     }
 
     @Override
     public Dimension getMinimumSize() {
         return this.getPreferredSize();
     }
-    
+
     @Override
     public Dimension getMaximumSize() {
-    	return this.getPreferredSize();
+        return this.getPreferredSize();
     }
-
+    
     @Override
     public void mouseClicked(MouseEvent e) {
         if (!_cardListener.isPresent()) {
@@ -124,6 +123,10 @@ public class CardView extends JPanel implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public interface CardSelectionDelegate {
+        void cardViewDidSelectCard(CardView cardView, Card card);
     }
 
 }

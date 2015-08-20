@@ -7,18 +7,22 @@ import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import utilities.Pair;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * CluedoGUIController represents the 'controller' layer in the MVC approach for this game, in contrast to the integrated ViewController approach.
+ * It responds to all of the methods declared in the CluedoInterface and manages state required for the GUI.
+ * All state is managed by this object itself: it is required to store any passed variables it will later need,
+ * since from the perspective of the model, all calls are purely functional and have no side effects.
+ */
 public class CluedoGUIController implements CluedoInterface {
 
 
+    private final Object _syncObject = new Object();
     private Game _gameState = null;
     private CluedoFrame _cluedoFrame = null;
-    private final Object _syncObject = new Object();
-
     private Player _currentPlayer = null;
     private Set<Location<Integer>> _blockedLocations = null;
     private Map<Location, Board.Path> _pathsForTurn = new HashMap<>();

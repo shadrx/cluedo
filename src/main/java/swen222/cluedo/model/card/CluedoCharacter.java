@@ -2,7 +2,7 @@ package swen222.cluedo.model.card;
 
 import swen222.cluedo.model.Location;
 
-import java.awt.Color;
+import java.awt.*;
 
 public enum CluedoCharacter implements Card {
     MissScarlet,
@@ -71,7 +71,7 @@ public enum CluedoCharacter implements Card {
             case ProfessorPlum:
                 return Color.decode("#46347a");
             default:
-                return null;
+                return Color.black;
         }
     }
 }

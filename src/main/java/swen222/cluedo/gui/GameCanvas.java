@@ -4,8 +4,7 @@ import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,33 +12,30 @@ import java.awt.geom.Rectangle2D;
 import java.util.Optional;
 import java.util.Set;
 
-public class GameCanvas extends JPanel {
 
-    public interface TileSelectionDelegate {
-        void didSelectTileAtLocation(Location<Integer> location);
-    }
+/**
+ * The GameCanvas is responsible for drawing the board, players, and the overlay for accessible tiles.
+ * It also handles animation for the players' movements.
+ * It can notify a TileSelectionDelegate whenever a tile is clicked.
+ */
+public class GameCanvas extends JPanel {
 
     private static final int WallWidth = 4;
     private static final double PlayerDiameterRatio = 0.6f; //0.7 * the size of the tile.
     private static final Font GameFont = new Font(null, Font.BOLD, 14);
-
     private static final double TilesPerMillisecond = 6.f/1000.f;
-
     private Game _gameState = null;
-
     private Optional<TileSelectionDelegate> _tileSelectionDelegate;
-
     private Board.Path _lastPlayerMove = null;
     private CluedoCharacter _lastPlayerMoveCharacter = null;
     private double _moveSequencePosition = -1.f;
-
     private Set<Board.Path> _accessibleTilePaths = null;
 
     public GameCanvas() {
         super(true);
 
         Timer runLoopTimer = new Timer(1000/60, (action) -> {
-            if (this.shouldPlayMoveSequence()) {
+            if (this.shouldPlayMoveSequence()) { //Update only if we're animating the player's movement.
                 this.update(1000/60);
                 this.repaint();
             }
@@ -100,6 +96,9 @@ public class GameCanvas extends JPanel {
         this.repaint();
     }
 
+    /**
+     * @return if there's an incomplete move sequence to animate.
+     */
     private boolean shouldPlayMoveSequence() {
         return _gameState != null && _lastPlayerMove != null && _moveSequencePosition != _lastPlayerMove.distance - 1;
     }
@@ -143,36 +142,35 @@ public class GameCanvas extends JPanel {
             tileCentreX -= WallWidth/4.0;
         }
 
-
         return new Location<>((float)(startX + tileSize * location.x + tileCentreX),(float)(startY + tileSize * location.y + tileCentreY));
     }
 
     private void drawPlayer(Graphics g, Location<Float> location, CluedoCharacter character, double step, boolean drawTransparent) {
 
-        //TODO these are not correctly centered and sometimes lack borders.
-
         double diameter = step * PlayerDiameterRatio;
 
         final double characterBorderRatio = 1.2f;
 
-        g.setColor(new Color(0.f, 0.f, 0.f, drawTransparent ? 0.2f : 1.f));
+        g.setColor(new Color(0.f, 0.f, 0.f, drawTransparent ? 0.2f : 1.f)); //Draw the black outline
         g.fillOval(round(location.x - diameter * characterBorderRatio / 2), round(location.y - diameter * characterBorderRatio / 2), round(diameter * characterBorderRatio), round(diameter * characterBorderRatio));
 
+        //Draw the character.
         g.setColor(new Color(character.colour().getRed(), character.colour().getGreen(), character.colour().getBlue(), drawTransparent ? 50 : 255));
         g.fillOval(round(location.x - diameter/2), round(location.y - diameter/2), round(diameter), round(diameter));
     }
 
     private void drawAccessibleTilesOverlay(Graphics g, Set<Board.Path> paths, double startX, double startY, double tileSize) {
-        for (Board.Path path : paths) {
+        for (Board.Path path : paths) { //Draw each path's endpoint, with transparency proportional to how far it is to travel.
             Location<Integer> endTile = path.locations[path.distance - 1];
 
             g.setColor(new Color(0.8f, 0.2f, 0.3f, 1.f - path.cost/14.f));
 
-            g.fillRect(round(startX + tileSize * endTile.x), round(startY + tileSize * endTile.y), round(tileSize), round(tileSize));
+            g.fillRect(round(startX + tileSize * endTile.x - 0.5), round(startY + tileSize * endTile.y - 0.5), round(tileSize + 1), round(tileSize + 1));
         }
     }
 
-    @SuppressWarnings("SuspiciousNameCombination") //so we don't get warned about using 'WallWidth' in conjunction with height
+    @SuppressWarnings("SuspiciousNameCombination")
+    //so we don't get warned about using 'WallWidth' in conjunction with height
     @Override
     protected void paintComponent(Graphics g) {
 
@@ -188,18 +186,18 @@ public class GameCanvas extends JPanel {
 
         Board board = _gameState.board;
 
-        double ratio = (double)board.width / board.height;
+        double ratio = (double) board.width / board.height;
 
         width = Math.min(width, (height * ratio));
         height = Math.min(height, (width / ratio));
 
-        double startX = this.getWidth()/2 - width/2;
-        double startY = this.getHeight()/2 - height/2;
+        double startX = this.getWidth() / 2 - width / 2;
+        double startY = this.getHeight() / 2 - height / 2;
 
         g.setColor(Color.yellow);
         g.fillRect(round(startX), round(startY), round(width), round(height));
 
-        //Draw grid
+        //Draw the grid.
 
         g.setColor(Color.black);
 
@@ -212,6 +210,7 @@ public class GameCanvas extends JPanel {
             g.drawLine(round(startX), round(y), round(startX + width), round(y));
         }
 
+        //Draw the room tiles.
 
         int x = 0;
         for (Board.Tile[] column : board.tiles) {
@@ -237,6 +236,7 @@ public class GameCanvas extends JPanel {
             x++;
         }
 
+        //Draw the walls.
         //Loop again to draw over what we already have.
 
         g.setColor(Color.black);
@@ -247,11 +247,11 @@ public class GameCanvas extends JPanel {
                 Location<Integer> location = new Location<>(x, y);
 
                 if (board.hasWallBetween(location, new Location<>(x + 1, y))) {
-                    g.fillRect(round(startX + step * (x + 1) - WallWidth/2), round(startY + step * y - 0.5), WallWidth, round(step + 1));
+                    g.fillRect(round(startX + step * (x + 1) - WallWidth / 2), round(startY + step * y - 0.5), WallWidth, round(step + 1));
                 }
 
                 if (board.hasWallBetween(location, new Location<>(x, y + 1))) {
-                    g.fillRect(round(startX + step * x - 0.5), round(startY + step * (y + 1) - WallWidth/2), round(step + 1), WallWidth);
+                    g.fillRect(round(startX + step * x - 0.5), round(startY + step * (y + 1) - WallWidth / 2), round(step + 1), WallWidth);
                 }
 
                 y++;
@@ -260,11 +260,15 @@ public class GameCanvas extends JPanel {
             x++;
         }
 
+
+        //Draw the outer walls.
+
         g.fillRect(round(startX), round(startY), WallWidth, round(height));
         g.fillRect(round(startX), round(startY), round(width), WallWidth);
         g.fillRect(round(startX + width - WallWidth), round(startY), WallWidth, round(height));
         g.fillRect(round(startX), round(startY + height - WallWidth), round(width), WallWidth);
 
+        //Draw the names for the rooms.
 
         g.setFont(GameFont);
         g.setColor(Color.black);
@@ -279,18 +283,21 @@ public class GameCanvas extends JPanel {
 
             Rectangle2D bounds = fontMetrics.getStringBounds(name, g);
 
-            g.drawString(name, (int)(centreX - bounds.getCenterX()), (int)(centreY - bounds.getCenterY()));
+            g.drawString(name, (int) (centreX - bounds.getCenterX()), (int) (centreY - bounds.getCenterY()));
         }
+
+        //Draw the players.
 
         boolean shouldPlayMoveSequence = this.shouldPlayMoveSequence();
         for (Player player : _gameState.allPlayers) {
             boolean drawTransparent = false;
             Location<Float> playerLocation;
             if (shouldPlayMoveSequence && //We haven't finished animating the move
-                    player.character == _lastPlayerMoveCharacter) { //The move is for this character
+                    player.character == _lastPlayerMoveCharacter) { //and the move is for this character
+                // then we need to lerp between two values in the move sequence for the character's position.
 
-                int lowIndex = (int)Math.floor(_moveSequencePosition);
-                int highIndex = (int)Math.ceil(_moveSequencePosition);
+                int lowIndex = (int) Math.floor(_moveSequencePosition);
+                int highIndex = (int) Math.ceil(_moveSequencePosition);
                 double lerpValue = _moveSequencePosition - lowIndex;
 
                 Location<Float> startLocation = this.centreForTileAtLocation(_lastPlayerMove.locations[lowIndex], board, startX, startY, step);
@@ -298,7 +305,7 @@ public class GameCanvas extends JPanel {
                 if (Location.distance(startLocation, endLocation) > step * 1.5) { //if the tiles aren't adjacent, allowing for some error.
                     drawTransparent = true;
                 }
-                playerLocation = Location.lerp(startLocation, endLocation, (float)lerpValue);
+                playerLocation = Location.lerp(startLocation, endLocation, (float) lerpValue);
             } else {
                 playerLocation = this.centreForTileAtLocation(player.location(), board, startX, startY, step);
             }
@@ -307,6 +314,7 @@ public class GameCanvas extends JPanel {
 
         }
 
+        //If we're supposed to draw the overlay for the paths, do so. Don't draw the overlay while we're animating.
         if (_accessibleTilePaths != null && !shouldPlayMoveSequence) {
             this.drawAccessibleTilesOverlay(g, _accessibleTilePaths, startX, startY, step);
         }
@@ -315,5 +323,9 @@ public class GameCanvas extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(600, 600);
+    }
+
+    public interface TileSelectionDelegate {
+        void didSelectTileAtLocation(Location<Integer> location);
     }
 }

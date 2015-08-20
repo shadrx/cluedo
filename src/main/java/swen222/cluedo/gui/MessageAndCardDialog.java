@@ -3,19 +3,21 @@ package swen222.cluedo.gui;
 import swen222.cluedo.model.card.Card;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Insets;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A self-displaying dialog that shows a list of cards in a CardView, a message, and (optionally) a close button.
+ * The intention is that the view is used for displaying results, in which case the close button is present,
+ * or used to select a card from a range of cards, in which case the dialog closes when a card is selected.
+ */
 public class MessageAndCardDialog extends JDialog {
+    private static final int VerticalGap = 10;
     public final String message;
     public final List<Card> cards;
 
-    private static final int VerticalGap = 10;
-    public MessageAndCardDialog(Frame parent, String title, String message, boolean showCloseButton, List<Card> cards, CardView.CardListener cardListener) {
+    public MessageAndCardDialog(Frame parent, String title, String message, boolean showCloseButton, List<Card> cards, CardView.CardSelectionDelegate cardSelectionDelegate) {
         super(parent, title, true);
         this.setModalityType(ModalityType.APPLICATION_MODAL);
 
@@ -29,8 +31,8 @@ public class MessageAndCardDialog extends JDialog {
         getContentPane().add(Box.createVerticalStrut(VerticalGap));
 
 
-        JTextArea label = new JTextArea();
-        label.setText(message);
+        JTextArea label = new JTextArea(); //Format the text area to look like a JLabel
+        label.setText(message);            //since we need it to be multiline, and JLabel doesn't have a convenient .numberOfLines = 0 workaround.
         label.setWrapStyleWord(true);
         label.setLineWrap(true);
         label.setOpaque(false);
@@ -46,8 +48,8 @@ public class MessageAndCardDialog extends JDialog {
         getContentPane().add(Box.createVerticalStrut(VerticalGap));
 
         CardView cardView = new CardView(cards, Optional.of((view, selectedCard) -> {
-            if (cardListener != null) {
-                cardListener.cardViewDidSelectCard(view, selectedCard);
+            if (cardSelectionDelegate != null) {
+                cardSelectionDelegate.cardViewDidSelectCard(view, selectedCard);
                 this.dispose();
             }
         }));

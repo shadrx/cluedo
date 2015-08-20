@@ -2,13 +2,14 @@ package swen222.cluedo.gui;
 
 import utilities.Pair;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 /**
  * A view that displays the result of two six sided dice.
+ * It also shows the original value of the dice in a label below (for when the remaining value is updated).
  */
 public class DiceView extends JPanel {
 
@@ -43,6 +44,7 @@ public class DiceView extends JPanel {
      *
      * @param remainingValue the remaining amount of value that can be used
      */
+    @SuppressWarnings("SuspiciousNameCombination")
     public void setRemainingValue(int remainingValue) {
         int leftDie = (int)Math.floor(Math.random() * (Math.min(remainingValue, 7) - 1)) + 1;
         int rightDie = remainingValue - leftDie;

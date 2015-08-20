@@ -8,27 +8,26 @@ import swen222.cluedo.model.card.Weapon;
 import utilities.SpringUtilities;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * PlayerSuggestionDialog is a self-displaying dialog that takes a player, a delegate to be
+ * notified of the response, and (optionally) a room to lock the response to.
+ * If the room is present, then it's considered a suggestion, since the room is locked for suggestions.
+ * However, if the room is not present, then it's considered an accusation.
+ * Different behaviour is applied depending on whether it's a suggestion or accusation. Suggestions allow any cards
+ * for player and weapon, whereas accusations are limited to exclude cards in the player's hand.
+ */
 public class PlayerSuggestionDialog extends JDialog {
 
-    public interface PlayerSuggestionDelegate {
-        void playerDidMakeSuggestion(PlayerSuggestionDialog dialog, Suggestion suggestion);
-        void playerDidCancelSuggestion(PlayerSuggestionDialog dialog);
-    }
-
     private final Optional<PlayerSuggestionDelegate> _delegate;
-
     private CluedoCharacter _character;
     private Weapon _weapon;
     private Room _room;
-
-
     /**
      * Creates a new PlayerSuggestionDialog, which is used for making either a suggestion or an accusation.
      * @param delegate The (optional) delegate, to be notified when the player has made their suggestion.
@@ -153,5 +152,11 @@ public class PlayerSuggestionDialog extends JDialog {
         buttonsPanel.add(closeButton);
 
         return buttonsPanel;
+    }
+
+    public interface PlayerSuggestionDelegate {
+        void playerDidMakeSuggestion(PlayerSuggestionDialog dialog, Suggestion suggestion);
+
+        void playerDidCancelSuggestion(PlayerSuggestionDialog dialog);
     }
 }
