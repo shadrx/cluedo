@@ -107,11 +107,11 @@ public class Board {
         Optional<Tile> t1 = this.safeTileAtLocation(l1);
         Optional<Tile> t2 = this.safeTileAtLocation(l2);
 
-        if ((t1.isPresent() && !t1.get().adjacentLocations.isEmpty()) || (t2.isPresent() && !t2.get().adjacentLocations.isEmpty())) {
+        if ((t1.isPresent() && !t1.get().connectedLocations.isEmpty()) || (t2.isPresent() && !t2.get().connectedLocations.isEmpty())) {
 
             boolean hasWall = false;
             if (t1.isPresent()) {
-                hasWall = !t1.get().adjacentLocations.containsValue(l2) || !t2.isPresent();
+                hasWall = !t1.get().connectedLocations.containsValue(l2) || !t2.isPresent();
             } else if (t2.isPresent()) {
                 hasWall = true; //there's always a wall between border tiles and the outside.
             }
@@ -119,25 +119,6 @@ public class Board {
         }
 
         return false;
-    }
-
-    private class DijkstraNode {
-        public int distanceFromSource = Integer.MAX_VALUE;
-        public int cost = Integer.MAX_VALUE;
-        public Optional<Location<Integer>> previousLocation = Optional.empty();
-        public Optional<Room> endRoom = Optional.empty();
-    }
-
-    public static class Path {
-        public final Location<Integer>[] locations;
-        public final int cost;
-        public final int distance;
-
-        public Path(Location<Integer>[] locations, int cost) {
-            this.locations = locations;
-            this.distance = locations.length;
-            this.cost = cost;
-        }
     }
 
     private Path reconstructPath(Location<Integer> endLocation, DijkstraNode[][] nodeData, int distance) {
@@ -159,8 +140,9 @@ public class Board {
 
     /**
      * Computes, using Dijkstra's algorithm, a set of the possible paths that can be taken from a location at a given cost
-     * @param location The start location
-     * @param maxCost The maximum allowed cost
+     *
+     * @param location         The start location
+     * @param maxCost          The maximum allowed cost
      * @param blockedLocations Any un-pathable locations
      * @return A set of the possible paths.
      */
@@ -190,7 +172,7 @@ public class Board {
             Tile currentTile = this.tileAtLocation(currentLocation);
             Optional<Room> endRoom = nodeData[currentLocation.x][currentLocation.y].endRoom;
 
-            for (Location<Integer> neighbour : currentTile.adjacentLocations.values()) {
+            for (Location<Integer> neighbour : currentTile.connectedLocations.values()) {
 
                 if (blockedLocations.contains(neighbour)) {
                     continue; //we can't continue along this path.
@@ -241,7 +223,7 @@ public class Board {
             Location<Integer> to = path.locations[i + 1];
             Tile fromTile = this.tileAtLocation(from);
             Direction direction = null;
-            for (Map.Entry<Direction, Location<Integer>> entry : fromTile.adjacentLocations.entrySet()) {
+            for (Map.Entry<Direction, Location<Integer>> entry : fromTile.connectedLocations.entrySet()) {
                 if (entry.getValue().equals(to)) {
                     direction = entry.getKey();
                     break;
@@ -270,7 +252,7 @@ public class Board {
 
         Location<Integer> location = startingLocation;
         for (Direction direction : directions) {
-            location = this.tileAtLocation(location).adjacentLocations.get(direction);
+            location = this.tileAtLocation(location).connectedLocations.get(direction);
             if (location == null) {
                 return Optional.empty();
             }
@@ -284,15 +266,24 @@ public class Board {
 
     private Room roomForCharacter(char c) {
         switch (c) {
-            case 'K': return Room.Kitchen;
-            case 'B': return Room.Ballroom;
-            case 'C': return Room.Conservatory;
-            case 'D': return Room.DiningRoom;
-            case 'I': return Room.BilliardRoom;
-            case 'H': return Room.Hall;
-            case 'L': return Room.Lounge;
-            case 'S': return Room.Study;
-            case 'R': return Room.Library;
+            case 'K':
+                return Room.Kitchen;
+            case 'B':
+                return Room.Ballroom;
+            case 'C':
+                return Room.Conservatory;
+            case 'D':
+                return Room.DiningRoom;
+            case 'I':
+                return Room.BilliardRoom;
+            case 'H':
+                return Room.Hall;
+            case 'L':
+                return Room.Lounge;
+            case 'S':
+                return Room.Study;
+            case 'R':
+                return Room.Library;
             default: return null;
         }
     }
@@ -323,12 +314,12 @@ public class Board {
      */
     private void linkTiles(Tile t1, Location<Integer> l1, Tile t2, Location<Integer> l2) {
         for (Direction d : Direction.values()) {
-            if (t1.adjacentLocations.get(d) == null) {
-                t1.adjacentLocations.put(d, l2);
+            if (t1.connectedLocations.get(d) == null) {
+                t1.connectedLocations.put(d, l2);
             }
 
-            if (t2.adjacentLocations.get(d) == null) {
-                t2.adjacentLocations.put(d, l1);
+            if (t2.connectedLocations.get(d) == null) {
+                t2.connectedLocations.put(d, l1);
             }
         }
     }
@@ -352,13 +343,17 @@ public class Board {
 
 
                 if ((mask & (1 << 4)) != 0) { //We need to check for the special path tiles within this method – we can't assign the locations until we've read all the tiles.
-                   kitchenPathTile = tile; kitchenPathLocation = new Location<>(x, y);
+                    kitchenPathTile = tile;
+                    kitchenPathLocation = new Location<>(x, y);
                 } else if ((mask & (1 << 5)) != 0) {
-                    studyPathTile = tile; studyPathLocation = new Location<>(x, y);
+                    studyPathTile = tile;
+                    studyPathLocation = new Location<>(x, y);
                 } else if ((mask & (1 << 6)) != 0) {
-                    conservatoryPathTile = tile; conservatoryPathLocation = new Location<>(x, y);
+                    conservatoryPathTile = tile;
+                    conservatoryPathLocation = new Location<>(x, y);
                 } else if ((mask & (1 << 7)) != 0) {
-                    loungePathTile = tile; loungePathLocation = new Location<>(x, y);
+                    loungePathTile = tile;
+                    loungePathLocation = new Location<>(x, y);
                 }
 
                 x++;
@@ -387,7 +382,7 @@ public class Board {
         if (move.size() > 0) {
             Direction head = move.get(0);
             Board.Tile tile = this.tileAtLocation(startLocation);
-            Location<Integer> nextLocationOrNull = tile.adjacentLocations.get(head);
+            Location<Integer> nextLocationOrNull = tile.connectedLocations.get(head);
 
             if (nextLocationOrNull == null) {
                 return Optional.empty();
@@ -398,18 +393,30 @@ public class Board {
         return Optional.of(startLocation);
     }
 
+    public static class Path {
+        public final Location<Integer>[] locations;
+        public final int cost;
+        public final int distance;
+
+        public Path(Location<Integer>[] locations, int cost) {
+            this.locations = locations;
+            this.distance = locations.length;
+            this.cost = cost;
+        }
+    }
+
     public static class Tile {
         public final Optional<Room> room;
-        public final Map<Direction, Location<Integer>> adjacentLocations;
+        public final Map<Direction, Location<Integer>> connectedLocations;
         // two tiles are adjacent if there is no wall between them
 
-        public Tile(Optional<Room> room, Map<Direction, Location<Integer>> adjacentLocations) {
+        public Tile(Optional<Room> room, Map<Direction, Location<Integer>> connectedLocations) {
             this.room = room;
-            this.adjacentLocations = adjacentLocations;
+            this.connectedLocations = connectedLocations;
         }
 
         public boolean isPassageway(Board board) {
-            for (Map.Entry<Direction, Location<Integer>> entry : this.adjacentLocations.entrySet()) {
+            for (Map.Entry<Direction, Location<Integer>> entry : this.connectedLocations.entrySet()) {
                 Direction direction = entry.getKey();
                 Location<Integer> location = entry.getValue();
                 Tile otherTile = board.tileAtLocation(location);
@@ -419,5 +426,12 @@ public class Board {
             }
             return false;
         }
+    }
+
+    private class DijkstraNode {
+        public int distanceFromSource = Integer.MAX_VALUE;
+        public int cost = Integer.MAX_VALUE;
+        public Optional<Location<Integer>> previousLocation = Optional.empty();
+        public Optional<Room> endRoom = Optional.empty();
     }
 }
