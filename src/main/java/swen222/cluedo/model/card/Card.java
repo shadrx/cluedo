@@ -77,7 +77,7 @@ public interface Card {
     String imageName();
 
     default Image cardImage() {
-        String imageName = "images/" + this.imageName();
+        String imageName = "images/cards/" + this.imageName();
         return loadImage(imageName);
     }
 }
