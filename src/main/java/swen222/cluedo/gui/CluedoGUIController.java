@@ -280,7 +280,6 @@ public class CluedoGUIController implements CluedoInterface {
 
         final SuggestionResponse[] response = {null};
 
-
         SwingUtilities.invokeLater(() -> {
 
             JOptionPane.showMessageDialog(_cluedoFrame, String.format("For %s's eyes only:", player.name.get()));

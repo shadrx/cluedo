@@ -36,7 +36,6 @@ public class GameCanvas extends JPanel {
     private double _moveSequencePosition = -1.f;
     private Set<Board.Path> _accessibleTilePaths = null;
 
-
     public GameCanvas() {
         super(true);
 
@@ -251,7 +250,7 @@ public class GameCanvas extends JPanel {
             int y = 0;
             for (Board.Tile tile : column) {
                 boolean hasRoom = tile.room.isPresent();
-                boolean isUnaccessibleSpace = tile.adjacentLocations.isEmpty();
+                boolean isUnaccessibleSpace = tile.connectedLocations.isEmpty();
                 if (hasRoom || isUnaccessibleSpace) {
                     g.setColor(hasRoom ? Color.lightGray : Color.cyan);
                     g.fillRect(round(x * step + startX - 0.5), round(y * step + startY - 0.5), round(step + 1), round(step + 1));
@@ -366,4 +365,5 @@ public class GameCanvas extends JPanel {
     public interface TileSelectionDelegate {
         void didSelectTileAtLocation(Location<Integer> location);
     }
+
 }
