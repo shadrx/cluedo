@@ -4,15 +4,16 @@ import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
 import swen222.cluedo.model.card.Weapon;
-import utilities.Utils;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -26,21 +27,15 @@ public class GameCanvas extends JPanel {
     private static final double PlayerDiameterRatio = 0.6f; //0.7 * the size of the tile.
     private static final Font GameFont = new Font(null, Font.BOLD, 14);
     private static final double TilesPerMillisecond = 6.f/1000.f;
+    private static final double WeaponTokenRatio = 2.0f; // 1.2 * the size of a tile
     private Game _gameState = null;
+    private Map<Room, Weapon> _weaponLocations = Collections.emptyMap();
     private Optional<TileSelectionDelegate> _tileSelectionDelegate;
     private Board.Path _lastPlayerMove = null;
     private CluedoCharacter _lastPlayerMoveCharacter = null;
     private double _moveSequencePosition = -1.f;
     private Set<Board.Path> _accessibleTilePaths = null;
 
-    private static final double WeaponTokenRatio = 2.0f; // 1.2 * the size of a tile
-    private static final Map<Weapon, Image> _weaponTokenImages = new HashMap<>();
-    static {
-        for (Weapon weapon : Weapon.values()) {
-            _weaponTokenImages.put(weapon, weapon.tokenImage());
-        }
-    }
-    private final Map<Weapon, Room> weaponTokenLocations = new HashMap<>();
 
     public GameCanvas() {
         super(true);
@@ -91,23 +86,15 @@ public class GameCanvas extends JPanel {
             public void mouseExited(MouseEvent e) {
             }
         });
-
-        placeWeaponsInRandomRooms();
-    }
-
-    private void placeWeaponsInRandomRooms() {
-        for (Weapon weapon : Weapon.values()) {
-            Room randomRoom = Utils.randomEnum(Room.class);
-            weaponTokenLocations.put(weapon, randomRoom);
-        }
     }
 
     public void setDelegate(TileSelectionDelegate delegate) {
         _tileSelectionDelegate = Optional.ofNullable(delegate);
     }
 
-    public void setGameState(Game gameState) {
-        _gameState = gameState;
+    public void setGameState(Game game, Map<Room, Weapon> weaponLocations) {
+        _gameState = game;
+        _weaponLocations = weaponLocations;
         this.repaint();
     }
 
@@ -129,18 +116,6 @@ public class GameCanvas extends JPanel {
 
         _lastPlayerMoveCharacter = player.character;
         _moveSequencePosition = 0.f;
-    }
-
-    /**
-     * Moves the weapon_tokens to the correct rooms based on the given suggestion
-     *
-     * @param suggestion suggestion to use
-     */
-    public void moveWeaponsBasedOnSuggestion(Optional<Suggestion> suggestion) {
-        if (suggestion.isPresent()) {
-            weaponTokenLocations.put(suggestion.get().weapon, suggestion.get().room);
-            repaint();
-        }
     }
 
     private void update(int deltaTime) {
@@ -201,14 +176,11 @@ public class GameCanvas extends JPanel {
         }
     }
 
-    private void drawWeaponTokensInRooms(Graphics g, Board board, double step, double startX, double startY) {
-        for (Map.Entry<Weapon, Room> weaponLocation : weaponTokenLocations.entrySet()) {
-            Location<Float> roomCentre = board.centreLocationForRoom(weaponLocation.getValue());
+    private void drawWeaponTokenForRoom(Graphics g, Board board, Room room, double centreX, double topY, double step) {
+        Weapon weapon = _weaponLocations.get(room);
 
-            double centreX = (roomCentre.x + 0.5f) * step + startX;
-            double centreY = (roomCentre.y + 0.5f) * step + startY;
-
-            Image weaponTokenImage = _weaponTokenImages.get(weaponLocation.getKey());
+        if (weapon != null) {
+            Image weaponTokenImage = weapon.tokenImage();
 
             double weaponTokenWidth = weaponTokenImage.getWidth(null);
             double weaponTokenHeight = weaponTokenImage.getHeight(null);
@@ -226,9 +198,9 @@ public class GameCanvas extends JPanel {
                 weaponTokenWidth = weaponTokenWidth/ratio;
             }
 
-
-            g.drawImage(weaponTokenImage, (int) (centreX - weaponTokenWidth/2), (int) (centreY +-weaponTokenHeight/2), (int) weaponTokenWidth, (int) weaponTokenHeight, null);
+            g.drawImage(weaponTokenImage, (int) (centreX - weaponTokenWidth / 2), (int) (topY), (int) weaponTokenWidth, (int) weaponTokenHeight, null);
         }
+
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
@@ -346,6 +318,10 @@ public class GameCanvas extends JPanel {
             Rectangle2D bounds = fontMetrics.getStringBounds(name, g);
 
             g.drawString(name, (int) (centreX - bounds.getCenterX()), (int) (centreY - bounds.getCenterY()));
+
+            double stringBottom = bounds.getCenterY() + centreY;
+
+            this.drawWeaponTokenForRoom(g, board, room, centreX, stringBottom, step);
         }
 
         //Draw the players.
@@ -380,8 +356,6 @@ public class GameCanvas extends JPanel {
         if (_accessibleTilePaths != null && !shouldPlayMoveSequence) {
             this.drawAccessibleTilesOverlay(g, _accessibleTilePaths, startX, startY, step);
         }
-
-        drawWeaponTokensInRooms(g, board, step, startX, startY);
     }
 
     @Override

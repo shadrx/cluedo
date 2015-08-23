@@ -5,6 +5,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -12,6 +14,8 @@ import java.util.Random;
  */
 public class Utils {
     private static final Random random = new Random();
+
+    private static final Map<String, BufferedImage> _imageCache = new HashMap<>();
 
     /**
      * Returns a random enum value from the given class.
@@ -31,15 +35,21 @@ public class Utils {
      * @return buffered image or null if no image was found
      */
     public static BufferedImage loadImage(String imagePath){
-        URL url = Utils.class.getClassLoader().getResource(imagePath);
-        if(url == null) return null;
+        BufferedImage image = _imageCache.get(imagePath);
 
-        try {
-            return ImageIO.read(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        if (image == null) {
+
+            URL url = Utils.class.getClassLoader().getResource(imagePath);
+            if (url == null) return null;
+            try {
+                image = ImageIO.read(url);
+                _imageCache.put(imagePath, image);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
+        return image;
     }
 
 }

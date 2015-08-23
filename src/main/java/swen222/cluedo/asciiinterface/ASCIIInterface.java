@@ -112,7 +112,7 @@ public class ASCIIInterface implements CluedoInterface {
     }
 
     @Override
-    public void showGame(Game game, Set<Location<Integer>> blockedLocations) {
+    public void showGame(Game game, Set<Location<Integer>> blockedLocations, Map<Room, Weapon> weaponLocations) {
         Board board = game.board;
 
         char[][] buffer = new char[2 * (board.width + 1)][2 * (board.height + 1)];

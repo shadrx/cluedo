@@ -5,6 +5,7 @@ import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.card.Weapon;
 import utilities.Pair;
 
 import javax.swing.*;
@@ -18,7 +19,6 @@ import java.util.stream.Collectors;
  * since from the perspective of the model, all calls are purely functional and have no side effects.
  */
 public class CluedoGUIController implements CluedoInterface {
-
 
     private final Object _syncObject = new Object();
     private Game _gameState = null;
@@ -185,12 +185,12 @@ public class CluedoGUIController implements CluedoInterface {
     }
 
     @Override
-    public void showGame(Game game, Set<Location<Integer>> blockedLocations) {
+    public void showGame(Game game, Set<Location<Integer>> blockedLocations, Map<Room, Weapon> weaponLocations) {
         _gameState = game;
 
         _blockedLocations = blockedLocations;
         SwingUtilities.invokeLater(() -> {
-            _cluedoFrame.canvas().setGameState(game);
+            _cluedoFrame.canvas().setGameState(game, weaponLocations);
             _cluedoFrame.canvas().setAccessibleTilePaths(null);
         });
     }
@@ -246,9 +246,7 @@ public class CluedoGUIController implements CluedoInterface {
         SwingUtilities.invokeLater(() -> new PlayerSuggestionDialog(_cluedoFrame, new PlayerSuggestionDialog.PlayerSuggestionDelegate() {
             @Override
             public void playerDidMakeSuggestion(PlayerSuggestionDialog dialog, Suggestion suggestion) {
-                Optional<Suggestion> suggestionOptional = Optional.of(suggestion);
-                _cluedoFrame.canvas().moveWeaponsBasedOnSuggestion(suggestionOptional);
-                retVal[0] = suggestionOptional;
+                retVal[0] = Optional.of(suggestion);
                 resumeGameThread();
             }
 
