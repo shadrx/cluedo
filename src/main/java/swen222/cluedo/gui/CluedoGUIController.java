@@ -172,7 +172,6 @@ public class CluedoGUIController implements CluedoInterface {
     public void notifyFailure(Player player) {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing.", player.name.get()), String.format("%s Made an Incorrect Accusation", player.name), JOptionPane.PLAIN_MESSAGE);
-            _cluedoFrame.dispose();
         });
     }
 
