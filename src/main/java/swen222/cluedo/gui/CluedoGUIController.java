@@ -246,7 +246,9 @@ public class CluedoGUIController implements CluedoInterface {
         SwingUtilities.invokeLater(() -> new PlayerSuggestionDialog(_cluedoFrame, new PlayerSuggestionDialog.PlayerSuggestionDelegate() {
             @Override
             public void playerDidMakeSuggestion(PlayerSuggestionDialog dialog, Suggestion suggestion) {
-                retVal[0] = Optional.of(suggestion);
+                Optional<Suggestion> suggestionOptional = Optional.of(suggestion);
+                _cluedoFrame.canvas().moveWeaponsBasedOnSuggestion(suggestionOptional);
+                retVal[0] = suggestionOptional;
                 resumeGameThread();
             }
 

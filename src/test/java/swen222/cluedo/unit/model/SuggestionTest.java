@@ -13,15 +13,15 @@ public class SuggestionTest {
 
     @Test
     public void suggestionsAreEqualIfThreeCardsAreTheSame() {
-        Suggestion equalSuggestionOne = new Suggestion(CluedoCharacter.ColonelMustard , Weapon.Dagger, Room.Ballroom);
-        Suggestion equalSuggestionTwo = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.Dagger, Room.Ballroom);
+        Suggestion equalSuggestionOne = new Suggestion(CluedoCharacter.ColonelMustard , Weapon.Knife, Room.Ballroom);
+        Suggestion equalSuggestionTwo = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.Knife, Room.Ballroom);
 
         assertEquals(equalSuggestionOne, equalSuggestionTwo);
     }
 
     @Test
     public void suggestionsAreNotEqualIfThreeCardsAreDifferent() {
-        Suggestion equalSuggestionOne = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.Dagger, Room.Ballroom);
+        Suggestion equalSuggestionOne = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.Knife, Room.Ballroom);
         Suggestion equalSuggestionTwo = new Suggestion(CluedoCharacter.ColonelMustard, Weapon.LeadPipe, Room.Ballroom);
 
         assertNotEquals(equalSuggestionOne, equalSuggestionTwo);
