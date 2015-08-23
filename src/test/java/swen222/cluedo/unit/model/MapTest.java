@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -22,7 +21,7 @@ public class MapTest {
     @Before
     public void loadBoard() {
         try {
-            InputStream boardStream = ClassLoader.getSystemClassLoader().getResourceAsStream("resources/cluedo.map");
+            InputStream boardStream = MapTest.class.getClassLoader().getResourceAsStream("cluedo.map");
             this.board = new Board(boardStream, 24, 25);
         } catch (IOException ex) {
             System.err.println("Error reading map file: " + ex);
@@ -50,16 +49,16 @@ public class MapTest {
             int y = 0;
             for (Board.Tile tile : column) {
                 Location<Integer> tileLocation = new Location<>(x, y);
-                for (Map.Entry<Direction, Location<Integer>> entry : tile.adjacentLocations.entrySet()) {
+                for (Map.Entry<Direction, Location<Integer>> entry : tile.connectedLocations.entrySet()) {
                     Board.Tile other = board.tileAtLocation(entry.getValue());
                     Direction oppositeDirection = this.oppositeDirection(entry.getKey());
 
-                    Location<Integer> returnedLocation = other.adjacentLocations.get(oppositeDirection);
+                    Location<Integer> returnedLocation = other.connectedLocations.get(oppositeDirection);
                     String message = String.format("Looking at tile at %d, %d in the direction %s",x, y, entry.getKey());
 
                     assertNotNull(message + ". The returned location should not be null.", returnedLocation);
                     if (Math.abs(tileLocation.x - returnedLocation.x) <= 1 && Math.abs(tileLocation.y - returnedLocation.y) <= 1) {
-                        assertEquals(message, tileLocation, other.adjacentLocations.get(oppositeDirection));
+                        assertEquals(message, tileLocation, other.connectedLocations.get(oppositeDirection));
                     }
                 }
                 y++;
