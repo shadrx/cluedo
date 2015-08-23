@@ -1,6 +1,7 @@
 package swen222.cluedo.model.card;
 
 import swen222.cluedo.model.Suggestion;
+import utilities.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.Image;
@@ -62,22 +63,10 @@ public interface Card {
         return hands;
     }
 
-    static BufferedImage loadImage(String imageFileName){
-        URL url = Card.class.getClassLoader().getResource(imageFileName);
-        if(url == null) return null;
-
-        try {
-            return ImageIO.read(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     String imageName();
 
     default Image cardImage() {
-        String imageName = "images/" + this.imageName();
-        return loadImage(imageName);
+        String imageName = "images/cards/" + this.imageName();
+        return Utils.loadImage(imageName);
     }
 }

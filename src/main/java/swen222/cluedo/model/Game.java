@@ -3,6 +3,7 @@ package swen222.cluedo.model;
 import swen222.cluedo.CluedoInterface;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.card.Weapon;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -98,9 +99,11 @@ public class Game {
         return false;
     }
 
-    private boolean checkForSuggestion(Player player, Room room) {
+    private boolean checkForSuggestion(Player player, Room room, Map<Room, Weapon> weaponLocations) {
         Optional<Suggestion> suggestion = player.cluedoInterface.requestPlayerSuggestion(player, room);
         if (suggestion.isPresent()) {
+            weaponLocations.put(room, suggestion.get().weapon);
+
             SuggestionResponse response = SuggestionResponse.UnableToDisprove();
 
             for (Player otherPlayer : this.otherPlayersFrom(player)) {
@@ -129,6 +132,8 @@ public class Game {
 
     public void gameLoop(List<Player> players) {
 
+        Map<Room, Weapon> weaponLocations = new HashMap<>();
+
         if (this.checkGameOver(players)) {
             return;
         }
@@ -151,7 +156,7 @@ public class Game {
                         .map(Player::location)
                         .collect(Collectors.toSet());
 
-                player.cluedoInterface.showGame(this, blockedLocations);
+                player.cluedoInterface.showGame(this, blockedLocations, weaponLocations);
 
                 while (!possibleActions.isEmpty()) {
 
@@ -168,7 +173,7 @@ public class Game {
                             }
                             break;
                         case Suggestion:
-                            if (this.checkForSuggestion(player, tile.room.get())) {
+                            if (this.checkForSuggestion(player, tile.room.get(), weaponLocations)) {
                                 possibleActions.remove(TurnOption.Move);
                                 possibleActions.remove(TurnOption.Suggestion);
                                 canMakeSuggestion = false;

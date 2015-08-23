@@ -3,9 +3,11 @@ package swen222.cluedo;
 import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.card.Weapon;
 import utilities.Pair;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -60,8 +62,9 @@ public interface CluedoInterface {
      *
      * @param game The current game.
      * @param blockedLocations The currently inaccessible locations on the board.
+     * @param weaponLocations The locations of the weapons currently on the board.
      */
-    void showGame(Game game, Set<Location<Integer>> blockedLocations);
+    void showGame(Game game, Set<Location<Integer>> blockedLocations, Map<Room, Weapon> weaponLocations);
 
     /**
      * Ask the player what action they want to take for their turn.

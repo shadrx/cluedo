@@ -5,6 +5,7 @@ import swen222.cluedo.model.*;
 import swen222.cluedo.model.card.Card;
 import swen222.cluedo.model.card.CluedoCharacter;
 import swen222.cluedo.model.card.Room;
+import swen222.cluedo.model.card.Weapon;
 import utilities.Pair;
 
 import javax.swing.*;
@@ -18,7 +19,6 @@ import java.util.stream.Collectors;
  * since from the perspective of the model, all calls are purely functional and have no side effects.
  */
 public class CluedoGUIController implements CluedoInterface {
-
 
     private final Object _syncObject = new Object();
     private Game _gameState = null;
@@ -172,7 +172,6 @@ public class CluedoGUIController implements CluedoInterface {
     public void notifyFailure(Player player) {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing.", player.name.get()), String.format("%s Made an Incorrect Accusation", player.name), JOptionPane.PLAIN_MESSAGE);
-            _cluedoFrame.dispose();
         });
     }
 
@@ -185,12 +184,12 @@ public class CluedoGUIController implements CluedoInterface {
     }
 
     @Override
-    public void showGame(Game game, Set<Location<Integer>> blockedLocations) {
+    public void showGame(Game game, Set<Location<Integer>> blockedLocations, Map<Room, Weapon> weaponLocations) {
         _gameState = game;
 
         _blockedLocations = blockedLocations;
         SwingUtilities.invokeLater(() -> {
-            _cluedoFrame.canvas().setGameState(game);
+            _cluedoFrame.canvas().setGameState(game, weaponLocations);
             _cluedoFrame.canvas().setAccessibleTilePaths(null);
         });
     }

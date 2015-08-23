@@ -1,12 +1,16 @@
 package swen222.cluedo.model.card;
 
+import utilities.Utils;
+
+import java.awt.Image;
+
 public enum Weapon implements Card {
     Candlestick,
-    Dagger,
+    Knife,
     LeadPipe,
     Revolver,
     Rope,
-    Spanner;
+    Wrench;
 
     @Override
     public String toString() {
@@ -20,13 +24,11 @@ public enum Weapon implements Card {
 
     @Override
     public String imageName() {
-        switch (this) {
-            case Spanner:
-                return "Wrench.png";
-            case Dagger:
-                return "Knife.png";
-            default:
-                return super.toString() + ".png"; //the name as specified in the enum, plus .png
-        }
+        return super.toString() + ".png"; //the name as specified in the enum, plus .png
+    }
+
+    public Image tokenImage() {
+        String imageName = "images/weapon_tokens/" + this.imageName();
+        return Utils.loadImage(imageName);
     }
 }

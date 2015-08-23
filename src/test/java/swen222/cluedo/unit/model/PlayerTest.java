@@ -48,7 +48,7 @@ public class PlayerTest {
 
     @Test
     public void testPossibleResponsesReturnsNoneForRequestWithNoCards() {
-        List<SuggestionResponse> possibleResponses = player.possibleResponses(new Suggestion(CluedoCharacter.MissScarlet, Weapon.Dagger, Room.BilliardRoom));
+        List<SuggestionResponse> possibleResponses = player.possibleResponses(new Suggestion(CluedoCharacter.MissScarlet, Weapon.Knife, Room.BilliardRoom));
         assertEquals(0, possibleResponses.size());
     }
 
