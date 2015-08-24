@@ -3,11 +3,7 @@ package swen222.cluedo.model.card;
 import swen222.cluedo.model.Suggestion;
 import utilities.Utils;
 
-import javax.imageio.ImageIO;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;

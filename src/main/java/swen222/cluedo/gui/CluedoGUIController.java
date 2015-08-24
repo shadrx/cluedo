@@ -23,9 +23,8 @@ public class CluedoGUIController implements CluedoInterface {
     private final Object _syncObject = new Object();
     private Game _gameState = null;
     private CluedoFrame _cluedoFrame = null;
-    private Player _currentPlayer = null;
     private Set<Location<Integer>> _blockedLocations = null;
-    private Map<Location, Board.Path> _pathsForTurn = new HashMap<>();
+    private Map<Location<Integer>, Board.Path> _pathsForTurn = new HashMap<>();
     private Board.Path _selectedPath = null;
     private Set<TurnOption> _possibleOptionsForTurn = Collections.emptySet();
     private Optional<TurnOption> _playerOptionForTurn = Optional.empty();
@@ -57,10 +56,6 @@ public class CluedoGUIController implements CluedoInterface {
 
     private void setupGUI() {
                 if (_cluedoFrame == null) {
-
-                    System.setProperty("apple.laf.useScreenMenuBar", "true");
-                    System.setProperty(
-                            "com.apple.mrj.application.apple.menu.about.name", "Name"); //use the OS X menu bar.
 
                     _cluedoFrame = new CluedoFrame();
                     _cluedoFrame.setActionDelegate(new ActionDelegate() {
@@ -141,8 +136,6 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public void notifyStartOfTurn(Player player, int diceRoll) {
-        _currentPlayer = player;
-
         SwingUtilities.invokeLater(() -> {
 
             this.setupGUI();
@@ -170,7 +163,11 @@ public class CluedoGUIController implements CluedoInterface {
 
     @Override
     public void notifyFailure(Player player) {
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing.", player.name.get()), String.format("%s Made an Incorrect Accusation", player.name.get()), JOptionPane.PLAIN_MESSAGE));
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(_cluedoFrame, String.format("%s has made an incorrect accusation and is no longer playing.", player.name.get()), String.format("%s Made an Incorrect Accusation", player.name.get()), JOptionPane.PLAIN_MESSAGE);
+            resumeGameThread();
+        });
+        waitForGUI();
     }
 
     @Override
@@ -287,7 +284,6 @@ public class CluedoGUIController implements CluedoInterface {
             new MessageAndCardDialog(_cluedoFrame, title, message, false, responseCards, (cardView, selectedCard) -> {
                 int responseIndex = responseCards.indexOf(selectedCard);
                 response[0] = possibleResponses.get(responseIndex);
-                long threadId = Thread.currentThread().getId();
                 resumeGameThread();
             });
         });

@@ -39,7 +39,7 @@ public class Utils {
 
         if (image == null) {
 
-            URL url = Utils.class.getClassLoader().getResource(imagePath);
+            URL url = ClassLoader.getSystemClassLoader().getResource(imagePath);
             if (url == null) return null;
             try {
                 image = ImageIO.read(url);

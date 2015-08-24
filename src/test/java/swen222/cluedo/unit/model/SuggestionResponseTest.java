@@ -2,7 +2,6 @@ package swen222.cluedo.unit.model;
 
 import org.junit.Test;
 import swen222.cluedo.model.Location;
-import swen222.cluedo.model.Suggestion;
 import swen222.cluedo.model.SuggestionResponse;
 import swen222.cluedo.model.card.CluedoCharacter;
 

@@ -417,7 +417,6 @@ public class Board {
 
         public boolean isPassageway(Board board) {
             for (Map.Entry<Direction, Location<Integer>> entry : this.connectedLocations.entrySet()) {
-                Direction direction = entry.getKey();
                 Location<Integer> location = entry.getValue();
                 Tile otherTile = board.tileAtLocation(location);
                 if (this.room.isPresent() && otherTile.room.isPresent() && !otherTile.room.get().equals(this.room.get())) {
